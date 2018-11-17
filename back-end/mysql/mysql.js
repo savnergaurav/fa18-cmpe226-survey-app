@@ -2,9 +2,9 @@ let mysql = require('mysql');
 const DATABASE_POOL = false;
 
 let pool = mysql.createPool({
-    host: 'localhost',
+    host: 'cmpe226.cesec0b1q06m.us-east-1.rds.amazonaws.com',
     user: 'root',
-    password: 'tiger123',
+    password: 'toor*root',
     database: 'respondmedb',
     connectionLimit: 10, // this is the max number of connections before your pool starts waiting for a release
 });
@@ -13,9 +13,9 @@ let pool = mysql.createPool({
 function getConnection() {
 
     var connection = mysql.createConnection({
-        host: 'localhost',
+        host: 'cmpe226.cesec0b1q06m.us-east-1.rds.amazonaws.com',
         user: 'root',
-        password: 'tiger123',
+        password: 'toor*root',
         database: 'respondmedb',
         port: 3306
     });
@@ -74,7 +74,7 @@ function fetchObjData(callback, obj, sqlQuery) {
     console.log("\nConnection closed..");
     connection.end();
 }
-
+getConnection();
 exports.getConnection = getConnection;
 exports.fetchData = fetchData;
 exports.fetchObjData = fetchObjData;

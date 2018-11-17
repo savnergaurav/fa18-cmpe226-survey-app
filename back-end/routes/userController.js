@@ -1,23 +1,29 @@
 // User Controller - Handles Login, Registration, Logout
-const bcrypt        = require('bcryptjs');
-const mysql         = require('../mysql/mysql');
-const DATABASE_POOL = require('../mysql/DATABASE_POOL');
+const bcrypt = require('bcryptjs');
+const mysql = require('../mysql/mysql');
+const DATABASE_POOL = require('../mysql/mysql');
 
 // REGISTRATION - POST: '/register'
 exports.registerUser = function registerUser(req, res) {
 
     let user = {
-        "username"  : req.body.username,
-        "email"     : req.body.email,
-        "password"  : req.body.password,
+        "username": req.body.username,
+        "email": req.body.email,
+        "password": req.body.password,
     };
 
-    let insertQuery = "INSERT INTO users SET ?";
+    console.log("Inside registerUser");
+
+    let insertQuery = `INSERT INTO USER (email, password) VALUES (${user.email}, ${user.password})`;
+    var sql = "INSERT INTO USER (email, password) VALUES (?)";
+    var values = [req.body.email, req.body.password];
 
     if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
-            if (err)
+            if (err) {
+                console.log("Error from first if");
                 return res.status(400).send(responseJSON("SERVER_someError"));
+            }
 
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(user.password, salt, (err, hash) => {
@@ -25,7 +31,8 @@ exports.registerUser = function registerUser(req, res) {
                     user.password = hash;
 
                     // if you got a connection...
-                    connection.query(insertQuery, user, function (err, rows) {
+                    connection.query(sql, [values], function (err, rows) {
+
                         if (err) {
                             connection.release();
                             if (err.code === "ER_DUP_ENTRY") {
@@ -33,8 +40,10 @@ exports.registerUser = function registerUser(req, res) {
                                     return res.status(400).send(responseJSON("REG_errorEmail"));
                                 else if (err.sqlMessage.match(/username_UNIQUE/g) == "username_UNIQUE")
                                     return res.status(400).send(responseJSON("REG_errorUsername"));
-                            } else
+                            } else {
+                                console.log("Error from here");
                                 return res.status(400).send(responseJSON("SERVER_someError"));
+                            }
                         }
 
                         // User registered successfully.
@@ -79,7 +88,7 @@ exports.loginUser = function authenticateUser(req, res) {
     let getUser = "SELECT * FROM users " +
         "WHERE username = ?";
 
-    if(DATABASE_POOL) {
+    if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
             if (err)
                 return res.status(400).send(responseJSON("SERVER_someError"));
@@ -96,7 +105,7 @@ exports.loginUser = function authenticateUser(req, res) {
                         if (resp) {
                             // Passwords match && User was found.
                             req.session.user = username;
-                            res.status(200).send({user: rows[0], message: "Login Successful"});
+                            res.status(200).send({ user: rows[0], message: "Login Successful" });
                         } else {
                             // Passwords don't match
                             res.status(401).send(responseJSON("INVALID_login"));
@@ -121,7 +130,7 @@ exports.loginUser = function authenticateUser(req, res) {
                     if (resp) {
                         // Passwords match && User was found.
                         req.session.user = username;
-                        res.status(200).send({user: rows[0], message: "Login Successful"});
+                        res.status(200).send({ user: rows[0], message: "Login Successful" });
                     } else {
                         // Passwords don't match
                         res.status(401).send(responseJSON("INVALID_login"));
@@ -137,12 +146,12 @@ exports.loginUser = function authenticateUser(req, res) {
 // SESSION CHECK - POST: '/authenticateUser'
 exports.authenticateUser = function authenticateUser(req, res) {
 
-    let username    = req.body.sessionUsername;
+    let username = req.body.sessionUsername;
 
-    let authUser    =   "SELECT * FROM users " +
-                        "WHERE username = ?";
+    let authUser = "SELECT * FROM users " +
+        "WHERE username = ?";
 
-    if(DATABASE_POOL) {
+    if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
             if (err)
                 return res.status(400).send(responseJSON("SERVER_someError"));
@@ -155,7 +164,7 @@ exports.authenticateUser = function authenticateUser(req, res) {
                 }
                 if (rows.length > 0) {
                     // User found.
-                    res.status(200).send({user: rows[0], message: "Authentication Successful!"});
+                    res.status(200).send({ user: rows[0], message: "Authentication Successful!" });
                 }
                 else // User doesn't exist. Hence, invalid session.
                     res.status(401).send(responseJSON("INVALID_session"));
@@ -171,7 +180,7 @@ exports.authenticateUser = function authenticateUser(req, res) {
             }
             if (rows.length > 0) {
                 // User found.
-                res.status(200).send({user: rows[0], message: "Authentication Successful!"});
+                res.status(200).send({ user: rows[0], message: "Authentication Successful!" });
             }
             else // User doesn't exist. Hence, invalid session.
                 res.status(401).send(responseJSON("INVALID_session"));
@@ -182,7 +191,7 @@ exports.authenticateUser = function authenticateUser(req, res) {
 // LOGOUT - POST: '/logout'
 exports.logoutUser = function logoutUser(req, res) {
 
-    if(req.session.user) {
+    if (req.session.user) {
         req.session.destroy();
         console.log("LOGGED OUT: Session Invalidated" + '\n');
         res.status(200).send(responseJSON("LOGOUT_success"));
