@@ -30,5 +30,11 @@
   "author": "CMPE_226_Team2",
   "license": "ISC",
   "description": "Respond Me is a dynamic survey generation platform.",
-  "repository": "https://github.com/savnergaurav/226-team-2.git"
+  "repository": "https://github.com/savnergaurav/226-team-2.git",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
