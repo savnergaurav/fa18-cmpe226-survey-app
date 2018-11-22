@@ -85,8 +85,9 @@ exports.loginUser = function authenticateUser(req, res) {
     let username = req.body.username;
     let password = req.body.password;
 
-    let getUser = "SELECT * FROM users " +
+    let getUser = "SELECT * FROM USER " +
         "WHERE username = ?";
+    let valuesTwo = [, req.body.password];
 
     if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {

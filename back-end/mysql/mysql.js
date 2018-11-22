@@ -74,7 +74,6 @@ function fetchObjData(callback, obj, sqlQuery) {
     console.log("\nConnection closed..");
     connection.end();
 }
-getConnection();
 exports.getConnection = getConnection;
 exports.fetchData = fetchData;
 exports.fetchObjData = fetchObjData;
