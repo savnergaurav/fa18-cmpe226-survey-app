@@ -7,16 +7,13 @@ const DATABASE_POOL = require('../mysql/mysql');
 exports.registerUser = function registerUser(req, res) {
 
     let user = {
-        "username": req.body.username,
         "email": req.body.email,
         "password": req.body.password,
     };
 
     console.log("Inside registerUser");
 
-    let insertQuery = `INSERT INTO USER (email, password) VALUES (${user.email}, ${user.password})`;
     var sql = "INSERT INTO USER (email, password) VALUES (?)";
-    var values = [req.body.email, req.body.password];
 
     if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
@@ -29,7 +26,8 @@ exports.registerUser = function registerUser(req, res) {
                 bcrypt.hash(user.password, salt, (err, hash) => {
                     // Store hash in database
                     user.password = hash;
-
+                    var values = [req.body.email, user.password];
+                    console.log(user.password);
                     // if you got a connection...
                     connection.query(sql, [values], function (err, rows) {
 
@@ -73,7 +71,7 @@ exports.registerUser = function registerUser(req, res) {
                     }
                     // User registered successfully.
                     res.status(200).send(responseJSON("REG_successMsg"));
-                }, user, insertQuery);
+                }, user, sql);
             });
         });
     }
