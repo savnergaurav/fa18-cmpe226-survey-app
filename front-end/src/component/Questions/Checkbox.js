@@ -39,7 +39,6 @@ class Checkbox extends Component{
         })       
         var question = {
             id : localStorage.getItem("qNumber"), 
-            qType : this.props.questions[this.props.id - 1].qType,
             lab : this.state.questionLabel,
             options : op
         }
@@ -76,8 +75,7 @@ class Checkbox extends Component{
             options1 = this.props.questions[i].options.map((op,index) => {
                 return(
                     <label className="radio-inline">
-                            <input type="checkbox"></input>{op}
-                            
+                            <input type="checkbox"></input>{op}   
                     </label>
                 )
             })

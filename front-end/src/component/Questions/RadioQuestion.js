@@ -40,7 +40,6 @@ class RadioQuestion extends Component{
         })       
         var question = {
             id : localStorage.getItem("qNumber"), 
-            qType : this.props.questions[this.props.id - 1].qType,
             lab : this.state.questionLabel,
             options : op
         }

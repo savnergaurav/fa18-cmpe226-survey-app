@@ -15,8 +15,14 @@ class QuestionPreview extends Component {
     var options = ["1","2","3","4"];
     event.preventDefault();
     var data = event.dataTransfer.getData(localStorage.getItem("qType"));
+    var qID = -1;
+    if(this.props.numberOfQuestion.length > 0){
+        qID = (this.props.numberOfQuestion[this.props.numberOfQuestion.length - 1].id + 1);
+    }else{
+      qID = 1;
+    }
     var question = {
-      id : (this.props.numberOfQuestion.length + 1), 
+      id : qID, 
       qType : document.getElementById(data).innerHTML,
       lab : document.getElementById(data).innerHTML,
       options : options,
