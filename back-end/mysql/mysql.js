@@ -4,7 +4,7 @@ const DATABASE_POOL = false;
 let pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'tiger123',
+    password: 'rajivyadav',
     database: 'respondmedb',
     connectionLimit: 10, // this is the max number of connections before your pool starts waiting for a release
 });
@@ -15,7 +15,7 @@ function getConnection() {
     var connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
-        password: 'tiger123',
+        password: 'rajivyadav',
         database: 'respondmedb',
         port: 3306
     });
@@ -69,6 +69,7 @@ function fetchObjData(callback, obj, sqlQuery) {
         }
         else {	// return err or result
             callback(err, rows);
+            
         }
     });
     console.log("\nConnection closed..");
