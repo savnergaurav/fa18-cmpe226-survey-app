@@ -5,7 +5,7 @@ exports.createQuestion = function createQuestion(req,res){
 
     
     console.log("Inside Questions Controller : ", req.body);
-    var insertQuery = "INSERT INTO SURVEY SET ?";
+    var insertQuery = "INSERT INTO QUESTION SET ?";
     if (DATABASE_POOL) {
         console.log("NO DATABASE POOL");
         mysql.pool.getConnection(function (err, connection) {
@@ -23,6 +23,7 @@ exports.createQuestion = function createQuestion(req,res){
                     }
                     connection.query(insertQuery, q, function(err,rows){
                         if (err) {
+                            console.log("CONNECTION ERROR : ", err);
                             connection.release();
                             return res.status(400).send(responseJSON("SERVER_someError"));
                         }else{
@@ -43,13 +44,12 @@ exports.createQuestion = function createQuestion(req,res){
                                         connection.release();
                                         return res.status(400).send(responseJSON("SERVER_someError"));
                                     }
-                                    //console.log("Rows : ", rows.insertId);
-                                    res.status(200).send({s_id : rows.insertId ,surveyName: surveyDetails.sname, message: "Survey Created Successfully"});
+                                    res.status(200).send({message: "Questions Created Successfully"});
                                     connection.release();
                                 })
                             }
-                            res.status(200).send({s_id : rows.insertId ,surveyName: surveyDetails.sname, message: "Survey Created Successfully"});
-                            connection.release();
+                            // res.status(200).send({message: "Questions Created Successfully"});
+                            // connection.release();
                         }
                     })
                 })

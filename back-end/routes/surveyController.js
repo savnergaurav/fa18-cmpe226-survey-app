@@ -47,8 +47,7 @@ exports.createSurvey = function createSurvey(req,res){
                                     return res.status(400).send(responseJSON("SERVER_someError"));
                                 }
                                 //console.log("Rows : ", rows.insertId);
-                                res.status(200).send({s_id : rows.insertId ,surveyName: surveyDetails.sname, message: "Survey Created Successfully"});
-                                connection.release();
+                                // 
                             })
                         }
                         res.status(200).send({s_id : rows.insertId,surveyName: surveyDetails.sname, message: "Survey Created Successfully"});
