@@ -1,7 +1,7 @@
 // User Controller - Handles Login, Registration, Logout
 const bcrypt        = require('bcryptjs');
 const mysql         = require('../mysql/mysql');
-const DATABASE_POOL = require('../mysql/DATABASE_POOL');
+const DATABASE_POOL = require('../mysql/mysql');
 
 // REGISTRATION - POST: '/register'
 exports.registerUser = function registerUser(req, res) {

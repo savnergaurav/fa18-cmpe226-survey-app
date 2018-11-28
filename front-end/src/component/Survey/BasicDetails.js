@@ -69,6 +69,7 @@ class BasicDetails extends Component{
             validDate : this.state.validDate,
             inviteEmails : this.state.inviteEmails
         }
+        console.log("Survey Details : ", surveyDetails);
         this.props.onSubmitClicked(surveyDetails);
 
     }

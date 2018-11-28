@@ -14,12 +14,15 @@ const { uploadProfileImage } = require('./middleware/file.storage');
 var index               = require('./routes/index');
 var userController      = require('./routes/userController');
 var profileController   = require('./routes/profileController');
+var surveyController   = require('./routes/surveyController');
+var questionsController   = require('./routes/questionController');
+
 
 // Express App
 var app = express();
 
 // View Engine Setup
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3001);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -27,7 +30,7 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 // CORS Setup
 app.use(cors({
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000',
     credentials: true
 }));
 // Environment Setup
@@ -52,17 +55,19 @@ app.use('/', index);
 
 // User Controller
 // POST
-app.post('/register', userController.registerUser);
-app.post('/login', userController.loginUser);
-app.post('/logout', authenticate, userController.logoutUser);
-app.post('/authenticateUser', authenticate, userController.authenticateUser);
+// app.post('/register', userController.registerUser);
+// app.post('/login', userController.loginUser);
+// app.post('/logout', authenticate, userController.logoutUser);
+// app.post('/authenticateUser', authenticate, userController.authenticateUser);
+app.post('/createSurvey', surveyController.createSurvey);
+app.post('/createQuestions', questionsController.createQuestion);
 
 
-// Profile Controller
-// POST
-app.post('/profile/save-profile-image', uploadProfileImage.any(), authenticate, profileController.uploadProfImage);
-// GET
-app.get('/profile-image', authenticate, profileController.fetchProfileImage);
+// // Profile Controller
+// // POST
+// app.post('/profile/save-profile-image', uploadProfileImage.any(), authenticate, profileController.uploadProfImage);
+// // GET
+// app.get('/profile-image', authenticate, profileController.fetchProfileImage);
 
 
 // Catch 404 and Forward to Error Handler
