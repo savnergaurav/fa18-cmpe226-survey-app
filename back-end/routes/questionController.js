@@ -72,7 +72,7 @@ function responseJSON(responseType) {
         case "INVALID_session":
             return { message: 'Invalid Session. Please login again!' };
         case "CREATE_successMsg":
-            return { message: 'Survey Created successfully.' };
+            return { message: 'Question Created successfully.' };
         case "SERVER_someError":
             return { message: 'There is some issue in server. Please try again later.' };
         default:
