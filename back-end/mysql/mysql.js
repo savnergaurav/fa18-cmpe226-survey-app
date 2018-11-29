@@ -2,9 +2,9 @@ let mysql = require('mysql');
 const DATABASE_POOL = false;
 
 let pool = mysql.createPool({
-    host: 'localhost',
+    host: 'cmpe226.cesec0b1q06m.us-east-1.rds.amazonaws.com',
     user: 'root',
-    password: 'rajivyadav',
+    password: 'toor*root',
     database: 'respondmedb',
     connectionLimit: 10, // this is the max number of connections before your pool starts waiting for a release
 });

@@ -16,6 +16,7 @@ var userController      = require('./routes/userController');
 var profileController   = require('./routes/profileController');
 var surveyController   = require('./routes/surveyController');
 var questionsController   = require('./routes/questionController');
+var dashboardController   = require('./routes/dashboardController');
 
 
 // Express App
@@ -50,6 +51,7 @@ app.use(session({
 
 // Default Route
 app.use('/', index);
+app.use('/dashboard', dashboardController);
 
 // React Frontend Requests - < http://localhost:3001 >
 
