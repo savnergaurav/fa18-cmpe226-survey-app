@@ -22,6 +22,7 @@ class SurveyStatistics extends Component {
             questionRespondTrend: true,
             optionTrend: false,
             responseTrendResponse: [],
+            optionTrendResponse: [],
             // Loop below for all questions for current survey_id
             // TODO: Step1: Fetch response_id from RESPONSE Table for current survey_id <--- Total 
             // Fetch all response detail from RESPONSE_DETAIL table for the Step 1 response_id (Group by question_id) <--- Step 2
@@ -194,11 +195,11 @@ class SurveyStatistics extends Component {
         });
 
 
-        // RESTService.dashboardResondedByYou( survey ).then(response => {
-        //     this.setState({
-        //         respondedByYouResponse : response.data.survey_data
-        //     });
-        // });        
+        RESTService.surveyOptionTrend( survey ).then(response => {
+            this.setState({
+                optionTrendResponse : response.data.survey_data
+            });
+        });        
     }
 
     handleMenuClick = (e) => {
@@ -224,8 +225,9 @@ class SurveyStatistics extends Component {
 
     render() {
        
-        let { questionRespondTrend, optionTrend, responseTrendResponse } = this.state;
+        let { questionRespondTrend, optionTrend, responseTrendResponse, optionTrendResponse } = this.state;
         let piedata = [];
+        let optionData = [];
         console.log('responseTrendResponse:');
         console.log(responseTrendResponse);
         for (let i = 0; i < responseTrendResponse.length; i++) {
@@ -238,7 +240,10 @@ class SurveyStatistics extends Component {
                     type: 'pie'
                 },
                 title: {
-                    text: 'Question Response Vs No response (Question ' + (i+1) + ')'
+                    text: 'Question Response Vs No response'
+                },
+                subtitle: {
+                    text: 'ABC'
                 },
                 plotOptions: {
                     pie: {
@@ -273,6 +278,53 @@ class SurveyStatistics extends Component {
         }
         console.log("piedata");
         console.log(piedata);
+
+        let optionTrendArray = {};
+        let questionIdToText = {};
+        for (let i = 0; i < optionTrendResponse.length; i++) {
+
+            if (optionTrendArray[optionTrendResponse[i].question_id] != null) {
+                optionTrendArray[optionTrendResponse[i].question_id].push([optionTrendResponse[i].option_value, optionTrendResponse[i].option_count]);
+            } else {
+                optionTrendArray[optionTrendResponse[i].question_id] = [[optionTrendResponse[i].option_value, optionTrendResponse[i].option_count]];
+                questionIdToText[optionTrendResponse[i].question_id] = optionTrendResponse[i].question_text;
+            }
+        }
+        
+        for( let key in optionTrendArray) {
+
+            let optionBarData =
+            {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Option Respond trend'
+                },
+                subtitle: {
+                    text: '(Q: ' + questionIdToText[key] + ')'
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Option Selected'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                series: [{
+                    name: '# of Responses',
+                    data: optionTrendArray[key]
+                }]
+            }
+            optionData.push(optionBarData);
+        }
+
+        console.log('###optionData:');
+        console.log(optionData);
         return (
             <Layout>
             <Sider style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}>
@@ -312,12 +364,13 @@ class SurveyStatistics extends Component {
                 }
                 {
                     optionTrend &&
+                    optionData.length > 0 &&
                     <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '100vh' }}>
                     
                         <Carousel showThumbs={false} showArrows useKeyboardArrows autoPlay>
                         {
-                                this.state.optionData.length &&
-                                this.state.optionData.map( (item, i) => {
+                                optionData.length &&
+                                optionData.map( (item, i) => {
                                     return <ReactHighcharts config={item} ref="chart"/>
                                 })
                         }

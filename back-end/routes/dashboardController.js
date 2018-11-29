@@ -104,11 +104,11 @@ router.post('/surveyResponseTrend', function(req,res) {
 
     let getResonseTrend = "SELECT question_id, count(rd1.id) responded, ( SELECT count(id) FROM RESPONSE " +
                                                                         "WHERE survey_id = ? ) total " +
-                        "FROM RESPONSE_DETAIL rd1 " +
-                        "WHERE response_id IN ( SELECT id FROM RESPONSE "+
-                                                    "WHERE survey_id = ? ) " +
-                        "GROUP BY question_id " +
-                        "ORDER BY question_id"
+                            "FROM RESPONSE_DETAIL rd1 " +
+                            "WHERE response_id IN ( SELECT id FROM RESPONSE "+
+                                                        "WHERE survey_id = ? ) " +
+                            "GROUP BY question_id " +
+                            "ORDER BY question_id";
 
     mysql.pool.getConnection(function (err, connection) {
         if (err) {
@@ -119,7 +119,7 @@ router.post('/surveyResponseTrend', function(req,res) {
         connection.query(getResonseTrend, [survey_id, survey_id], function (err, rows) {
             if (err) {
                 console.log('err');
-                console.log(err);                
+                console.log(err);
                 connection.release();
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
@@ -155,7 +155,7 @@ router.post('/surveyOptionTrend', function(req,res) {
     // WHERE q_id IN (SELECT qid from respondmedb.QUESTION
     //                 WHERE s_id = '1')) as T2 ON T1.option_id = T2.id   
 
-    let getOptionsTrend = "SELECT question_id, option_id, count(id) option_count " +
+    let getOptionsTrend = "SELECT qtext, question_id, option_id, count(id) option_count " +
                         "FROM RESPONSE_DETAIL rd1 JOIN QUESTION q " +
                                                                 "ON (rd1.question_id = q.qid) AND q.qtype <> 'TEXT' "+
                     "WHERE response_id IN ( SELECT id FROM RESPONSE " +
@@ -179,9 +179,8 @@ router.post('/surveyOptionTrend', function(req,res) {
             if (rows.length > 0) {
                 
                 // res.status(200).send({survey_data: rows, message: "Surveys sent"});
-                let getOptionsDetails = "SELECT * FROM `OPTION` " +
-                                    "WHERE q_id IN (SELECT qid from QUESTION " +
-                                                    "WHERE s_id = ? )"
+                let getOptionsDetails = "SELECT * FROM `OPTION` o JOIN QUESTION q " +
+                                                                    "ON (o.q_id = q.qid) AND s_id = ? ";
 
                 mysql.pool.getConnection(function (err, connection2) {
                     if (err) {
@@ -202,14 +201,12 @@ router.post('/surveyOptionTrend', function(req,res) {
                             let tempResult = [];
                             let found;
                             rows2.map((row) => {
-                                // surveyIds.push(row.id);
-                                console.log("row.survey_data:");
-                                console.log(row.id);
-                                console.log(row.value);
+
                                 let element = {
                                     question_id: row.q_id,
                                     option_id: row.id,
                                     option_value: row.value,
+                                    question_text: row.qtext,
                                     option_count: 0
                                 }
                                 for (let i in rows) {
@@ -218,9 +215,9 @@ router.post('/surveyOptionTrend', function(req,res) {
                                             question_id: row.q_id,
                                             option_id: row.id,
                                             option_value: row.value,
+                                            question_text: row.qtext,
                                             option_count: rows[i].option_count
                                         }
-                                        console.log(row [i]);
                                     }
                                 }
                                 tempResult.push(element);
