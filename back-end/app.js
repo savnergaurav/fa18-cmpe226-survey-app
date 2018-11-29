@@ -1,22 +1,22 @@
 // Loading Dependencies
-var express         = require('express');
-var session         = require('client-sessions');
-var logger          = require('morgan');
-var cookieParser    = require('cookie-parser');
-var bodyParser      = require('body-parser');
-var path            = require('path');
-var cors            = require('cors');
+var express = require('express');
+var session = require('client-sessions');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var path = require('path');
+var cors = require('cors');
 
 // Middleware
-var { authenticate }    = require('./middleware/authentication');
+var { authenticate } = require('./middleware/authentication');
 const { uploadProfileImage } = require('./middleware/file.storage');
 // Define routes here.
-var index               = require('./routes/index');
-var userController      = require('./routes/userController');
-var profileController   = require('./routes/profileController');
-var surveyController   = require('./routes/surveyController');
-var questionsController   = require('./routes/questionController');
-var dashboardController   = require('./routes/dashboardController');
+var index = require('./routes/index');
+var userController = require('./routes/userController');
+var profileController = require('./routes/profileController');
+var surveyController = require('./routes/surveyController');
+var questionsController = require('./routes/questionController');
+var dashboardController = require('./routes/dashboardController');
 
 
 // Express App
@@ -41,12 +41,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // CLIENT-SESSIONS Setup
 app.use(session({
-    cookieName          : 'session',
-    resave              : false,
-    saveUninitialized   : false,
-    secret              : 'cmpe226_team2',
-    duration            : 30 * 60 * 1000,    // Overall duration of Session : 30 minutes : 1800 seconds
-    activeDuration      :  5 * 60 * 1000,    // Session extension time limit:  5 minutes :  300 seconds
+    cookieName: 'session',
+    resave: false,
+    saveUninitialized: false,
+    secret: 'cmpe226_team2',
+    duration: 30 * 60 * 1000,    // Overall duration of Session : 30 minutes : 1800 seconds
+    activeDuration: 5 * 60 * 1000,    // Session extension time limit:  5 minutes :  300 seconds
 }));
 
 // Default Route
@@ -63,6 +63,9 @@ app.use('/dashboard', dashboardController);
 // app.post('/authenticateUser', authenticate, userController.authenticateUser);
 app.post('/createSurvey', surveyController.createSurvey);
 app.post('/createQuestions', questionsController.createQuestion);
+app.post('/fetchMySurveys', surveyController.fetchMySurveys);
+app.post('/fetchSharedWithMe', surveyController.fetchSharedWithMe);
+app.post('/fetchVolunteerSurvey', surveyController.fetchVolunteerSurvey);
 
 
 // // Profile Controller
@@ -73,10 +76,10 @@ app.post('/createQuestions', questionsController.createQuestion);
 
 
 // Catch 404 and Forward to Error Handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // Error Handler
