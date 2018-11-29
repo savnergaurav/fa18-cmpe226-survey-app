@@ -107,7 +107,8 @@ router.post('/surveyResponseTrend', function(req,res) {
                         "FROM RESPONSE_DETAIL rd1 " +
                         "WHERE response_id IN ( SELECT id FROM RESPONSE "+
                                                     "WHERE survey_id = ? ) " +
-                        "GROUP BY question_id";
+                        "GROUP BY question_id " +
+                        "ORDER BY question_id"
 
     mysql.pool.getConnection(function (err, connection) {
         if (err) {

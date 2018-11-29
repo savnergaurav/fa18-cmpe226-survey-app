@@ -7,9 +7,11 @@ import { Layout, Menu, Icon, Table } from 'antd';
 import ReactHighcharts from 'react-highcharts';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
+import {RESTService} from "../../api/index";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Column, ColumnGroup } = Table;
+
 
 
 class SurveyStatistics extends Component {
@@ -19,91 +21,91 @@ class SurveyStatistics extends Component {
         this.state = {
             questionRespondTrend: true,
             optionTrend: false,
-
+            responseTrendResponse: [],
             // Loop below for all questions for current survey_id
             // TODO: Step1: Fetch response_id from RESPONSE Table for current survey_id <--- Total 
             // Fetch all response detail from RESPONSE_DETAIL table for the Step 1 response_id (Group by question_id) <--- Step 2
             // count(response_id) in Step 1 - Step 2 for every question
-            piedata: [
-                {
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
-                    },
-                    title: {
-                        text: 'Question Response Vs No response'
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.y}'
-                            },
-                            colors: [
-                                '#50b432', 
-                                '#db4437'
-                            ]
-                        }
-                    },
-                    series: [{
-                        name: 'question_response_trend',
-                        colorByPoint: true,
-                        data: [{
-                            name: 'Attempted',
-                            y: 180
-                        }, {
-                            name: 'Not Responded',
-                            y: 20
-                        }]
-                    }],
-                    credits: {
-                        enabled: false
-                    },
-                },
-                {
-                    chart: {
-                        plotBackgroundColor: null,
-                        plotBorderWidth: null,
-                        plotShadow: false,
-                        type: 'pie'
-                    },
-                    title: {
-                        text: 'Question Response Vs No response'
-                    },
-                    plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.y}'
-                            },
-                            colors: [
-                                '#50b432', 
-                                '#db4437'
-                            ]
-                        }
-                    },
-                    series: [{
-                        name: 'question_response_trend',
-                        colorByPoint: true,
-                        data: [{
-                            name: 'Attempted',
-                            y: 10
-                        }, {
-                            name: 'Not Responded',
-                            y: 120
-                        }]
-                    }],
-                    credits: {
-                        enabled: false
-                    }
-                }
-            ],
+            // piedata: [
+            //     {
+            //         chart: {
+            //             plotBackgroundColor: null,
+            //             plotBorderWidth: null,
+            //             plotShadow: false,
+            //             type: 'pie'
+            //         },
+            //         title: {
+            //             text: 'Question Response Vs No response'
+            //         },
+            //         plotOptions: {
+            //             pie: {
+            //                 allowPointSelect: true,
+            //                 cursor: 'pointer',
+            //                 dataLabels: {
+            //                     enabled: true,
+            //                     format: '<b>{point.name}</b>: {point.y}'
+            //                 },
+            //                 colors: [
+            //                     '#50b432', 
+            //                     '#db4437'
+            //                 ]
+            //             }
+            //         },
+            //         series: [{
+            //             name: 'question_response_trend',
+            //             colorByPoint: true,
+            //             data: [{
+            //                 name: 'Attempted',
+            //                 y: 180
+            //             }, {
+            //                 name: 'Not Responded',
+            //                 y: 20
+            //             }]
+            //         }],
+            //         credits: {
+            //             enabled: false
+            //         },
+            //     },
+            //     {
+            //         chart: {
+            //             plotBackgroundColor: null,
+            //             plotBorderWidth: null,
+            //             plotShadow: false,
+            //             type: 'pie'
+            //         },
+            //         title: {
+            //             text: 'Question Response Vs No response'
+            //         },
+            //         plotOptions: {
+            //             pie: {
+            //                 allowPointSelect: true,
+            //                 cursor: 'pointer',
+            //                 dataLabels: {
+            //                     enabled: true,
+            //                     format: '<b>{point.name}</b>: {point.y}'
+            //                 },
+            //                 colors: [
+            //                     '#50b432', 
+            //                     '#db4437'
+            //                 ]
+            //             }
+            //         },
+            //         series: [{
+            //             name: 'question_response_trend',
+            //             colorByPoint: true,
+            //             data: [{
+            //                 name: 'Attempted',
+            //                 y: 10
+            //             }, {
+            //                 name: 'Not Responded',
+            //                 y: 120
+            //             }]
+            //         }],
+            //         credits: {
+            //             enabled: false
+            //         }
+            //     }
+            // ],
             optionData: [
                 {
                     chart: {
@@ -177,6 +179,26 @@ class SurveyStatistics extends Component {
 
         console.log(this.props);
         console.log("###this.props.match.params.surveyId:" + this.props.match.params.surveyId);
+
+        let survey = {
+            survey_id: this.props.match.params.surveyId
+            // survey_id: '1'
+        }
+
+        RESTService.surveyResponseTrend( survey ).then(response => {
+            console.log('response');
+            console.log(response.data.survey_data);
+            this.setState({
+                responseTrendResponse : response.data.survey_data
+            });
+        });
+
+
+        // RESTService.dashboardResondedByYou( survey ).then(response => {
+        //     this.setState({
+        //         respondedByYouResponse : response.data.survey_data
+        //     });
+        // });        
     }
 
     handleMenuClick = (e) => {
@@ -200,18 +222,57 @@ class SurveyStatistics extends Component {
         }
     }
 
-    createQuestionResponseGraph = () => {
-        let temp=[];
-        for(let i=0; i<this.state.piedata.length; i++) {
-            temp.push(<div key={i}><ReactHighcharts config={this.state.piedata[i]} ref="chart"/></div>);
-        }
-        return temp;
-    }
-
     render() {
        
-        let { questionRespondTrend, optionTrend } = this.state;
-        
+        let { questionRespondTrend, optionTrend, responseTrendResponse } = this.state;
+        let piedata = [];
+        console.log('responseTrendResponse:');
+        console.log(responseTrendResponse);
+        for (let i = 0; i < responseTrendResponse.length; i++) {
+
+            let questionPieData = {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Question Response Vs No response (Question ' + (i+1) + ')'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.y}'
+                        },
+                        colors: [
+                            '#50b432', 
+                            '#db4437'
+                        ]
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'question_response_trend',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Attempted',
+                        y: responseTrendResponse[i].responded
+                    }, {
+                        name: 'Not Responded',
+                        y: responseTrendResponse[i].total - responseTrendResponse[i].responded
+                    }]
+                }]
+            }
+            piedata.push(questionPieData);
+        }
+        console.log("piedata");
+        console.log(piedata);
         return (
             <Layout>
             <Sider style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}>
@@ -238,11 +299,12 @@ class SurveyStatistics extends Component {
                 }
                 {
                     questionRespondTrend &&
+                    piedata.length > 0 &&
                     <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '100vh' }}>
-                        <Carousel showThumbs={false} showArrows useKeyboardArrows autoPlay>
+                        <Carousel showThumbs={false} showArrows useKeyboardArrows>
                             {
-                                this.state.piedata.length &&
-                                this.state.piedata.map( (item, i) => {
+                                piedata.length > 0 &&
+                                piedata.map( (item, i) => {
                                 return <ReactHighcharts config={item} ref="chart"/>
                             })}
                         </Carousel>
