@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const api = process.env.REACT_APP_CONTACTS_API_URL || 'http://localhost:3000';
+const api = process.env.REACT_APP_CONTACTS_API_URL || 'http://localhost:3001';
 
 
 axios.defaults.withCredentials = true;
