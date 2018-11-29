@@ -37,9 +37,9 @@ class Dashboard extends Component {
             this.setState({
                 respondedByYouResponse : response.data.survey_data
             });
-        });        
-
+        });
     }
+    
     handleMenuClick = (e) => {
         // console.log('e.key: ', e.key);
 
