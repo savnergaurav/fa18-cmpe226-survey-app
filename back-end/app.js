@@ -11,7 +11,7 @@ var cors = require('cors');
 var { authenticate } = require('./middleware/authentication');
 const { uploadProfileImage } = require('./middleware/file.storage');
 // Define routes here.
-var index = require('./routes/index');
+// var index = require('./routes/index');
 var userController = require('./routes/userController');
 var profileController = require('./routes/profileController');
 var surveyController = require('./routes/surveyController');
@@ -21,15 +21,15 @@ var surveyController = require('./routes/surveyController');
 var app = express();
 
 // View Engine Setup
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+// app.set('port', process.env.PORT || 3000);
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'ejs');
 
 // DEV Logging
 app.use(logger('dev'));
 // CORS Setup
 app.use(cors({
-    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000',
     credentials: true
 }));
 // Environment Setup
@@ -48,7 +48,7 @@ app.use(session({
 }));
 
 // Default Route
-app.use('/', index);
+// app.use('/', index);
 
 // React Frontend Requests - < http://localhost:3001 >
 
@@ -58,9 +58,9 @@ app.post('/register', userController.registerUser);
 app.post('/login', userController.loginUser);
 app.post('/logout', authenticate, userController.logoutUser);
 app.post('/authenticateUser', authenticate, userController.authenticateUser);
-app.get('/fetchMySurveys', surveyController.fetchMySurveys);
-app.get('/fetchSharedWithMe', surveyController.fetchSharedWithMe);
-app.get('/fetchVolunteerSurvey', surveyController.fetchVolunteerSurvey);
+app.post('/fetchMySurveys', surveyController.fetchMySurveys);
+app.post('/fetchSharedWithMe', surveyController.fetchSharedWithMe);
+app.post('/fetchVolunteerSurvey', surveyController.fetchVolunteerSurvey);
 
 
 // Profile Controller
