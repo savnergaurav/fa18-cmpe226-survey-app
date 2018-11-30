@@ -185,73 +185,78 @@ class Dashboard extends Component {
         }
         return (
             <Layout>
-            <Sider style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}>
-              <div className="logo" />
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.handleMenuClick} style={{ height: '100vh' }}>
-                    <Menu.Item key="1" style={{height: '10%' }}>
-                        <Icon type="bar-chart" />
-                        <span className="nav-text">Created by You</span>
-                    </Menu.Item>
-                    <Menu.Item key="2" style={{height: '10%' }} >
-                        <Icon type="user"/>
-                        <span className="nav-text">Responded by You</span>
-                    </Menu.Item>
-                </Menu>
-            </Sider>
-            <Layout style={{ marginLeft: 200 }}>
-                {
-                    myCreatedSurveys &&
-                    <Header style={{ background: '#fff'}} > <h3>Surveys created by you </h3> </Header>
-                }
-                {
-                    myRespondedSurveys &&
-                    <Header style={{ background: '#fff'}} > <h3> Surveys responded by you </h3> </Header>
-                }                
-                {
-                    myCreatedSurveys &&
-                    <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '70vh' }}>
-                        <Chart chartType="Bar" width="100%" height="90%" data={inviteRespondedData1} options={options}/>
-                    </Content>
-                }
-                {
-                    myRespondedSurveys &&
-                    <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '70vh' }}>
-                        <Chart chartType="Bar" width="100%" height="90%" data={inviteRespondedData2} options={options}/>
-                    </Content>
-                }
-                {
-                    myCreatedSurveys &&
-                    <Table dataSource={surveyList1}>
-                        <Column title="Survey Name" dataIndex="surveyName" key="surveyName" />
-                        <Column title="Type" dataIndex="surveyType" key="surveyType" />
-                        <Column title="Created Date" dataIndex="surveyCreatedDate" key="surveyCreatedDate" />
-                        <Column title="Validity" dataIndex="surveyValidity" key="surveyValidity"/>
-                        <Column align = 'center' title="Action" key="action" render={(text, record) => (
-                            <span>
-                                <a href={`/SurveyStatistics/${record.key}`}> View Statistics </a>
-                            </span>
-                        )}
-                        />
-                    </Table>
-                }
-
-                {
-                    myRespondedSurveys &&
-                    <Table dataSource={surveyList2}>
-                        <Column title="Survey Name" dataIndex="surveyName" key="surveyName" />
-                        <Column title="Type" dataIndex="surveyType" key="surveyType" />
-                        <Column title="Created Date" dataIndex="surveyCreatedDate" key="surveyCreatedDate" />
-                        <Column title="Validity" dataIndex="surveyValidity" key="surveyValidity"/>
-                        <Column align = 'center' title="Action" key="action" render={(text, record) => (
-                            <span>
-                                <a href={`/SurveyStatistics/${record.key}`}> View Statistics </a>
-                            </span>
-                        )}
-                        />
-                    </Table>
-                }                
-            </Layout>
-          </Layout>
+                <Header className="header">
+                    <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ lineHeight: '64px' }}>
+                        <Menu.Item key="1"><a href={`/home`}> Home </a> </Menu.Item>
+                        <Menu.Item key="2"><a href={`/dashboard`}> Dashboard </a> </Menu.Item>
+                        <Menu.Item key="3"><a href={`/`}> Create Survey </a> </Menu.Item>
+                    </Menu>
+                </Header>
+                <Content style={{ padding: '0 50px'}}>
+                    <Layout style={{ padding: '0', height: '100vh'  }}>
+                        <Sider width={200} style={{ height: '100vh'}}>
+                            <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.handleMenuClick} style={{ height: '100vh' }}>
+                                <Menu.Item key="1" style={{height: '10%' }}>
+                                    <Icon type="bar-chart" />
+                                    <span className="nav-text">Created by You</span>
+                                </Menu.Item>
+                                <Menu.Item key="2" style={{height: '10%' }} >
+                                    <Icon type="user"/>
+                                    <span className="nav-text">Responded by You</span>
+                                </Menu.Item>
+                            </Menu>
+                        </Sider>
+                        <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '75vh' }}>
+                            {
+                                myCreatedSurveys &&
+                                <h3>Surveys created by you </h3>
+                            }
+                            {
+                                myRespondedSurveys &&
+                                <h3> Surveys responded by you </h3>
+                            }
+                            {
+                                myCreatedSurveys &&
+                                <Chart chartType="Bar" width="100%" height="90%" data={inviteRespondedData1} options={options}/>
+                            }
+                            {
+                                myRespondedSurveys &&
+                                <Chart chartType="Bar" width="100%" height="90%" data={inviteRespondedData2} options={options}/>
+                            }
+                            {
+                                myCreatedSurveys &&
+                                <Table bordered dataSource={surveyList1}>
+                                    <Column title="Survey Name" dataIndex="surveyName" key="surveyName" />
+                                    <Column title="Type" dataIndex="surveyType" key="surveyType" />
+                                    <Column title="Created Date" dataIndex="surveyCreatedDate" key="surveyCreatedDate" />
+                                    <Column title="Validity" dataIndex="surveyValidity" key="surveyValidity"/>
+                                    <Column align = 'center' title="Action" key="action" render={(text, record) => (
+                                        <span>
+                                            <a href={`/SurveyStatistics/${record.key}`}> View Statistics </a>
+                                        </span>
+                                    )}
+                                    />
+                                </Table>
+                            }
+                            {
+                                myRespondedSurveys &&
+                                <Table bordered dataSource={surveyList2}>
+                                    <Column title="Survey Name" dataIndex="surveyName" key="surveyName" />
+                                    <Column title="Type" dataIndex="surveyType" key="surveyType" />
+                                    <Column title="Created Date" dataIndex="surveyCreatedDate" key="surveyCreatedDate" />
+                                    <Column title="Validity" dataIndex="surveyValidity" key="surveyValidity"/>
+                                    <Column align = 'center' title="Action" key="action" render={(text, record) => (
+                                        <span>
+                                            <a href={`/SurveyStatistics/${record.key}`}> View Statistics </a>
+                                        </span>
+                                    )}
+                                    />
+                                </Table>
+                            }
+                        </Content>
+                    </Layout>
+                </Content>
+            </Layout>           
         );
     }
 }

@@ -327,58 +327,67 @@ class SurveyStatistics extends Component {
         console.log(optionData);
         return (
             <Layout>
-            <Sider style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }}>
-              <div className="logo" />
-                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.handleMenuClick} style={{ height: '100vh' }}>
-                    <Menu.Item key="1" style={{height: '10%' }}>
-                        <Icon type="bar-chart" />
-                        <span className="nav-text">Response Trend</span>
-                    </Menu.Item>
-                    <Menu.Item key="2" style={{height: '10%' }} >
-                        <Icon type="user"/>
-                        <span className="nav-text">Option Trend</span>
-                    </Menu.Item>
-                </Menu>
-            </Sider>
-            <Layout style={{ marginLeft: 200 }}>
-                {
-                    questionRespondTrend &&
-                    <Header style={{ background: '#fff'}} > <h3>Respond/ No-Response Trend </h3> </Header>
-                }
-                {
-                    optionTrend &&
-                    <Header style={{ background: '#fff'}} > <h3> Options Response Trend </h3> </Header>
-                }
-                {
-                    questionRespondTrend &&
-                    piedata.length > 0 &&
-                    <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '100vh' }}>
-                        <Carousel showThumbs={false} showArrows useKeyboardArrows>
+                <Header className="header">
+                    <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ lineHeight: '64px' }}>
+                        <Menu.Item key="1"><a href={`/home`}> Home </a> </Menu.Item>
+                        <Menu.Item key="2"><a href={`/dashboard`}> Dashboard </a> </Menu.Item>
+                        <Menu.Item key="3"><a href={`/`}> Create Survey </a> </Menu.Item>
+                    </Menu>
+                </Header>
+                <Content style={{ padding: '0 50px' }}>
+                    <Layout style={{ padding: '0'}}>
+                        <Sider width={200} style={{ height: '100vh'}}>
+                            <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.handleMenuClick} style={{ height: '100vh' }}>
+                                <Menu.Item key="1" style={{height: '10%' }}>
+                                    <Icon type="bar-chart" />
+                                    <span className="nav-text">Response Trend</span>
+                                </Menu.Item>
+                                <Menu.Item key="2" style={{height: '10%' }} >
+                                    <Icon type="user"/>
+                                    <span className="nav-text">Option Trend</span>
+                                </Menu.Item>
+                            </Menu>
+                        </Sider>
+                        <Content style={{ margin: '24px 16px 0', padding: '0 24px', minHeight: 280 }}>
                             {
+                                questionRespondTrend &&
+                                <h3>Respond/ No-Response Trend </h3>
+                            }
+                            {
+                                optionTrend &&
+                                <h3> Options Response Trend </h3>
+                            }                            
+                            {
+                                questionRespondTrend &&
                                 piedata.length > 0 &&
-                                piedata.map( (item, i) => {
-                                return <ReactHighcharts config={item} ref="chart"/>
-                            })}
-                        </Carousel>
-                    </Content>
-                }
-                {
-                    optionTrend &&
-                    optionData.length > 0 &&
-                    <Content style={{ margin: '24px 16px 0', overflow: 'initial', height : '100vh' }}>
-                    
-                        <Carousel showThumbs={false} showArrows useKeyboardArrows autoPlay>
-                        {
-                                optionData.length &&
-                                optionData.map( (item, i) => {
-                                    return <ReactHighcharts config={item} ref="chart"/>
-                                })
-                        }
-                        </Carousel>
-                    </Content>
-                }
+                                <Content style={{ height : '100vh' }}>
+                                    <Carousel showThumbs={false} showArrows useKeyboardArrows>
+                                        {
+                                            piedata.length > 0 &&
+                                            piedata.map( (item, i) => {
+                                            return <ReactHighcharts config={item} ref="chart"/>
+                                        })}
+                                    </Carousel>
+                                </Content>
+                            }
+                            {
+                                optionTrend &&
+                                optionData.length > 0 &&
+                                <Content style={{ height : '100vh' }}>
+                                    <Carousel showThumbs={false} showArrows useKeyboardArrows autoPlay>
+                                    {
+                                            optionData.length &&
+                                            optionData.map( (item, i) => {
+                                                return <ReactHighcharts config={item} ref="chart"/>
+                                            })
+                                    }
+                                    </Carousel>
+                                </Content>
+                            }                            
+                        </Content>
+                    </Layout>
+                </Content>
             </Layout>
-          </Layout>
         );
     }
 }
