@@ -24,7 +24,9 @@
     "redux-promise": "^0.6.0",
     "redux-thunk": "^2.3.0",
     "survey-react": "^1.0.58",
-    "history": "^4.7.2"
+    "history": "^4.7.2",
+    "winston": "^3.1.0",
+    "nodemailer": "^4.7.0"
   },
   "scripts": {
     "start": "react-scripts start",
