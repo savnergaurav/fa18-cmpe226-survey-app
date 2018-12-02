@@ -10,7 +10,10 @@ export const RESTService = {
     dashboardCreatedByYou,
     dashboardResondedByYou,
     surveyResponseTrend,
-    surveyOptionTrend
+    surveyOptionTrend,
+    getUserCities,
+    filteredResponseTrend,
+    filteredOptionTrend
 };
 
 function signup(user) {
@@ -33,9 +36,26 @@ function surveyResponseTrend(survey) {
     return axiosPost(surveyResponseTrend, survey);
 }
 
+function filteredResponseTrend(survey) {
+    let filteredResponseTrend = api + '/dashboard/filteredResponseTrend';
+    return axiosPost(filteredResponseTrend, survey);
+}
+
 function surveyOptionTrend(survey) {
     let surveyOptionTrend = api + '/dashboard/surveyOptionTrend';
     return axiosPost(surveyOptionTrend, survey);
+}
+
+function filteredOptionTrend(survey) {
+    let filteredOptionTrend = api + '/dashboard/filteredOptionTrend';
+    return axiosPost(filteredOptionTrend, survey);
+}
+
+function getUserCities() {
+    let getUserCities = api+"/dashboard/getUserCities";
+    return axios.get(getUserCities)
+        .then(handleSuccess)
+        .catch(handleError);
 }
 
 function axiosPost(url, data) {

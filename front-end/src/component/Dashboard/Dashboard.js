@@ -192,9 +192,9 @@ class Dashboard extends Component {
                         <Menu.Item key="3"><a href={`/`}> Create Survey </a> </Menu.Item>
                     </Menu>
                 </Header>
-                <Content style={{ padding: '0 50px'}}>
-                    <Layout style={{ padding: '0', height: '100vh'  }}>
-                        <Sider width={200} style={{ height: '100vh'}}>
+                <Content>
+                    <Layout style={{ height: '100%'  }}>
+                        <Sider width={200} style={{ height: '100%'}}>
                             <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.handleMenuClick} style={{ height: '100vh' }}>
                                 <Menu.Item key="1" style={{height: '10%' }}>
                                     <Icon type="bar-chart" />

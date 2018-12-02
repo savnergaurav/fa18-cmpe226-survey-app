@@ -3,16 +3,17 @@ import {Router, Route} from 'react-router-dom';
 import './SurveyStatistics.css';
 import {connect} from 'react-redux';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Icon, Table } from 'antd';
+import { Layout, Menu, Icon, Table, Select, Radio, Button } from 'antd';
 import ReactHighcharts from 'react-highcharts';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import {RESTService} from "../../api/index";
+import {history} from '../../history';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Column, ColumnGroup } = Table;
-
-
+const Option = Select.Option;
+const RadioGroup = Radio.Group;
 
 class SurveyStatistics extends Component {
 
@@ -23,6 +24,8 @@ class SurveyStatistics extends Component {
             optionTrend: false,
             responseTrendResponse: [],
             optionTrendResponse: [],
+            userCities: [],
+            filterValue: '',
             // Loop below for all questions for current survey_id
             // TODO: Step1: Fetch response_id from RESPONSE Table for current survey_id <--- Total 
             // Fetch all response detail from RESPONSE_DETAIL table for the Step 1 response_id (Group by question_id) <--- Step 2
@@ -176,6 +179,82 @@ class SurveyStatistics extends Component {
         }
     }
 
+    handleGenderChange = value => {
+        console.log(value);
+        let survey = {
+            survey_id: this.props.match.params.surveyId,
+            filterCity: null,
+            filterGender: value
+        }
+
+        RESTService.filteredResponseTrend( survey ).then(response => {
+            console.log('Gender change response::');
+            console.log(response.data.survey_data[0]);
+            this.setState({
+                responseTrendResponse : response.data.survey_data[0]
+            });
+        });
+    }
+
+    handleCityChange = value => {
+        console.log(value);
+        let survey = {
+            survey_id: this.props.match.params.surveyId,
+            filterCity: value,
+            filterGender: null
+        }
+
+        RESTService.filteredResponseTrend( survey ).then(response => {
+            console.log('City change response::');
+            console.log(response.data.survey_data[0]);
+            this.setState({
+                responseTrendResponse : response.data.survey_data[0]
+            });
+        });
+    }
+
+    handleGenderChangeOption = value => {
+        console.log(value);
+        let survey = {
+            survey_id: this.props.match.params.surveyId,
+            filterCity: null,
+            filterGender: value
+        }
+
+        RESTService.filteredOptionTrend( survey ).then(response => {
+            console.log('Gender change response::');
+            console.log(response.data.survey_data[0]);
+            this.setState({
+                optionTrendResponse : response.data.survey_data
+            });
+        });
+    }
+
+    handleCityChangeOption = value => {
+        console.log(value);
+        let survey = {
+            survey_id: this.props.match.params.surveyId,
+            filterCity: value,
+            filterGender: null
+        }
+
+        RESTService.filteredOptionTrend( survey ).then(response => {
+            console.log('City change response::');
+            console.log(response.data.survey_data[0]);
+            this.setState({
+                optionTrendResponse : response.data.survey_data
+            });
+        });
+    }
+
+
+    onRadioChange = (e) => {
+        console.log('radio checked', e.target.value);
+        this.setState({
+          filterValue: e.target.value,
+        });
+    }
+
     componentDidMount() {
 
         console.log(this.props);
@@ -186,6 +265,14 @@ class SurveyStatistics extends Component {
             // survey_id: '1'
         }
 
+        RESTService.getUserCities( ).then(response => {
+            console.log('usercities');
+            console.log(response.data.survey_data);
+            this.setState({
+                userCities : response.data.survey_data
+            });
+        });
+    
         RESTService.surveyResponseTrend( survey ).then(response => {
             console.log('response');
             console.log(response.data.survey_data);
@@ -194,12 +281,15 @@ class SurveyStatistics extends Component {
             });
         });
 
-
         RESTService.surveyOptionTrend( survey ).then(response => {
             this.setState({
                 optionTrendResponse : response.data.survey_data
             });
         });        
+    }
+
+    resetFilter = e => {
+        history.push(`/SurveyStatistics/${this.props.match.params.surveyId}`);
     }
 
     handleMenuClick = (e) => {
@@ -225,11 +315,49 @@ class SurveyStatistics extends Component {
 
     render() {
        
-        let { questionRespondTrend, optionTrend, responseTrendResponse, optionTrendResponse } = this.state;
+        let { questionRespondTrend, optionTrend, responseTrendResponse, optionTrendResponse, filterValue, userCities } = this.state;
         let piedata = [];
         let optionData = [];
         console.log('responseTrendResponse:');
         console.log(responseTrendResponse);
+     
+        if (responseTrendResponse.length === 0) {
+            let questionPieData = {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                title: {
+                    text: "No Response Data for current filter"
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.y}'
+                        },
+                        colors: [
+                            '#50b432', 
+                            '#db4437'
+                        ]
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'question_response_trend',
+                    colorByPoint: true,
+                    data: []
+                }]
+            }
+            piedata.push(questionPieData);            
+        }
+
         for (let i = 0; i < responseTrendResponse.length; i++) {
 
             let questionPieData = {
@@ -240,10 +368,7 @@ class SurveyStatistics extends Component {
                     type: 'pie'
                 },
                 title: {
-                    text: 'Question Response Vs No response'
-                },
-                subtitle: {
-                    text: 'ABC'
+                    text: responseTrendResponse[i].qtext
                 },
                 plotOptions: {
                     pie: {
@@ -325,6 +450,9 @@ class SurveyStatistics extends Component {
 
         console.log('###optionData:');
         console.log(optionData);
+
+        console.log('###this.state.filterValue:');
+        console.log(this.state.filterValue);        
         return (
             <Layout>
                 <Header className="header">
@@ -334,8 +462,8 @@ class SurveyStatistics extends Component {
                         <Menu.Item key="3"><a href={`/`}> Create Survey </a> </Menu.Item>
                     </Menu>
                 </Header>
-                <Content style={{ padding: '0 50px' }}>
-                    <Layout style={{ padding: '0'}}>
+                <Content >
+                    <Layout>
                         <Sider width={200} style={{ height: '100vh'}}>
                             <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={this.handleMenuClick} style={{ height: '100vh' }}>
                                 <Menu.Item key="1" style={{height: '10%' }}>
@@ -351,29 +479,57 @@ class SurveyStatistics extends Component {
                         <Content style={{ margin: '24px 16px 0', padding: '0 24px', minHeight: 280 }}>
                             {
                                 questionRespondTrend &&
-                                <h3>Respond/ No-Response Trend </h3>
+                                <h3>Response/ No-Response Trend </h3>
                             }
                             {
                                 optionTrend &&
                                 <h3> Options Response Trend </h3>
-                            }                            
+                            }
                             {
                                 questionRespondTrend &&
                                 piedata.length > 0 &&
-                                <Content style={{ height : '100vh' }}>
+                                <Content style={{ height : '70vh' }}>
                                     <Carousel showThumbs={false} showArrows useKeyboardArrows>
                                         {
                                             piedata.length > 0 &&
                                             piedata.map( (item, i) => {
-                                            return <ReactHighcharts config={item} ref="chart"/>
-                                        })}
+                                                return <ReactHighcharts config={item} ref="chart"/>
+                                            })
+                                        }
                                     </Carousel>
+                                    <div className = "filter_div">
+                                        <RadioGroup onChange={this.onRadioChange} value={filterValue}>
+                                            <Radio value='Gender'>Gender</Radio>
+                                            <Radio value='City'>City</Radio>
+                                        </RadioGroup>
+                                        {
+                                            filterValue == 'Gender' &&
+                                            <Select showSearch style={{ width: 100 }} placeholder="Gender" optionFilterProp="children" onChange={this.handleGenderChange} 
+                                                    filterOption={(input, option)=> option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                                                <Option value="F">Female</Option>
+                                                <Option value="M">Male</Option>
+                                            </Select>
+                                        }
+                                        {
+                                            filterValue == 'City' &&
+                                            <Select showSearch style={{ width: 150 }} placeholder="City" optionFilterProp="children" onChange={this.handleCityChange} 
+                                                filterOption={(input, option)=> option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                                                    {
+                                                        userCities.length > 0 &&
+                                                        userCities.map( (item, i) => {
+                                                            return <Option value={item.city}>{item.city}</Option>
+                                                        })
+                                                    }
+                                            </Select>
+                                        }
+                                        <Button style={{float: 'right'}} type="primary" size='large' onClick = {this.resetFilter}>Reset Filters</Button>
+                                    </div>
                                 </Content>
                             }
                             {
                                 optionTrend &&
                                 optionData.length > 0 &&
-                                <Content style={{ height : '100vh' }}>
+                                <Content style={{ height : '70vh' }}>
                                     <Carousel showThumbs={false} showArrows useKeyboardArrows autoPlay>
                                     {
                                             optionData.length &&
@@ -382,8 +538,34 @@ class SurveyStatistics extends Component {
                                             })
                                     }
                                     </Carousel>
+                                    <div className = "filter_div">
+                                        <RadioGroup onChange={this.onRadioChange} value={filterValue}>
+                                            <Radio value='Gender'>Gender</Radio>
+                                            <Radio value='City'>City</Radio>
+                                        </RadioGroup>
+                                        {
+                                            filterValue == 'Gender' &&
+                                            <Select showSearch style={{ width: 100 }} placeholder="Gender" optionFilterProp="children" onChange={this.handleGenderChangeOption} 
+                                                    filterOption={(input, option)=> option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                                                <Option value="F">Female</Option>
+                                                <Option value="M">Male</Option>
+                                            </Select>
+                                        }
+                                        {
+                                            filterValue == 'City' &&
+                                            <Select showSearch style={{ width: 150 }} placeholder="City" optionFilterProp="children" onChange={this.handleCityChangeOption} 
+                                                filterOption={(input, option)=> option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                                                    {
+                                                        userCities.length > 0 &&
+                                                        userCities.map( (item, i) => {
+                                                            return <Option value={item.city}>{item.city}</Option>
+                                                        })
+                                                    }
+                                            </Select>
+                                        }
+                                    </div>                                    
                                 </Content>
-                            }                            
+                            }
                         </Content>
                     </Layout>
                 </Content>

@@ -17,6 +17,7 @@ var profileController = require('./routes/profileController');
 var surveyController = require('./routes/surveyController');
 var questionsController = require('./routes/questionController');
 var dashboardController = require('./routes/dashboardController');
+const log = require('./config/logger');
 
 
 // Express App
@@ -48,6 +49,12 @@ app.use(session({
     duration: 30 * 60 * 1000,    // Overall duration of Session : 30 minutes : 1800 seconds
     activeDuration: 5 * 60 * 1000,    // Session extension time limit:  5 minutes :  300 seconds
 }));
+
+app.use(function(req,res,next){
+    log.info('['+ req.method +']' + req.url);
+    log.info('[Request Body]' + req.body);
+    next();
+})
 
 // Default Route
 app.use('/', index);

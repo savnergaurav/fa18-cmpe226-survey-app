@@ -3,11 +3,13 @@ const DATABASE_POOL = require('../mysql/mysql');
 var { authenticate }    = require('../middleware/authentication');
 const express = require('express');
 const router = express.Router();
+const logger = require('../config/logger');
 
 // Dashboard survey (Created by you) - POST: '/dashboardCreatedByYou'
 router.post('/dashboardCreatedByYou', function(req,res) {
 
     let username = req.body.username;
+
 
     let getSurveys = "SELECT *, (SELECT count(*) FROM INVITES "+
                                     "WHERE s_id = s1.id " +
@@ -20,14 +22,14 @@ router.post('/dashboardCreatedByYou', function(req,res) {
 
     mysql.pool.getConnection(function (err, connection) {
         if (err) {
+            logger.error(err);
             return res.status(400).send(responseJSON("SERVER_someError"));
         }
 
         // successful connection...
         connection.query(getSurveys, [username], function (err, rows) {
             if (err) {
-                console.log('err');
-                console.log(err);                
+                logger.error(err);        
                 connection.release();
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
@@ -54,8 +56,6 @@ router.post('/dashboardCreatedByYou', function(req,res) {
 // Dashboard survey (Responded by you) - POST: '/dashboardResondedByYou'
 router.post('/dashboardResondedByYou', function(req,res) {
     
-    console.log('req.body');
-    console.log(JSON.stringify(req.body));
     let username = req.body.username;
 
     let getSurveys = "SELECT (SELECT count(*) FROM INVITES "+
@@ -69,14 +69,50 @@ router.post('/dashboardResondedByYou', function(req,res) {
 
     mysql.pool.getConnection(function (err, connection) {
         if (err) {
+            logger.error(err);
             return res.status(400).send(responseJSON("SERVER_someError"));
         }
 
         // successful connection...
         connection.query(getSurveys, [username], function (err, rows) {
             if (err) {
-                console.log('err');
-                console.log(err);                
+                logger.error(err);              
+                connection.release();
+                return res.status(400).send(responseJSON("SERVER_someError"));
+            }
+
+            if (rows.length > 0) {
+                
+                res.status(200).send({survey_data: rows, message: "Surveys sent"});
+            } else {
+                // No matching data.
+                res.status(400).send(responseJSON("NO_DATA"));
+            }
+
+            // Release the connection
+            connection.release();
+        });
+    });
+});
+
+// Dashboard survey (Get All user cities for filtering) - GET: '/getUserCities'
+router.get('/getUserCities', function(req,res) {
+
+    let getUserCities = "SELECT distinct(city) "+
+                        "FROM USER "+
+                        "WHERE city IS NOT NULL"
+
+
+    mysql.pool.getConnection(function (err, connection) {
+        if (err) {
+            logger.error(err);
+            return res.status(400).send(responseJSON("SERVER_someError"));
+        }
+
+        // successful connection...
+        connection.query(getUserCities, function (err, rows) {
+            if (err) {
+                logger.error(err);                
                 connection.release();
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
@@ -102,24 +138,30 @@ router.post('/surveyResponseTrend', function(req,res) {
     console.log(JSON.stringify(req.body));
     let survey_id = req.body.survey_id;
 
-    let getResonseTrend = "SELECT question_id, count(rd1.id) responded, ( SELECT count(id) FROM RESPONSE " +
-                                                                        "WHERE survey_id = ? ) total " +
-                            "FROM RESPONSE_DETAIL rd1 " +
-                            "WHERE response_id IN ( SELECT id FROM RESPONSE "+
-                                                        "WHERE survey_id = ? ) " +
-                            "GROUP BY question_id " +
+    // let getResonseTrend = "SELECT question_id, count(rd1.id) responded, ( SELECT count(id) FROM RESPONSE " +
+    //                                                                     "WHERE survey_id = ? ) total " +
+    //                         "FROM RESPONSE_DETAIL rd1 " +
+    //                         "WHERE response_id IN ( SELECT id FROM RESPONSE "+
+    //                                                     "WHERE survey_id = ? ) " +
+    //                         "GROUP BY question_id " +
+    //                         "ORDER BY question_id";
+
+    let getResonseTrend = "SELECT question_id, question_text qtext, " +
+                            "responded, total " +
+                            "FROM QUESTION_RESPONSE_CHART qrc " +
+                            "WHERE survey_id = ? "
                             "ORDER BY question_id";
 
     mysql.pool.getConnection(function (err, connection) {
         if (err) {
+            logger.error(err);
             return res.status(400).send(responseJSON("SERVER_someError"));
         }
 
         // successful connection...
         connection.query(getResonseTrend, [survey_id, survey_id], function (err, rows) {
             if (err) {
-                console.log('err');
-                console.log(err);
+                logger.error(err);
                 connection.release();
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
@@ -138,6 +180,44 @@ router.post('/surveyResponseTrend', function(req,res) {
     });
 });
 
+// Dashboard Survey Statistics (Filtered Response Vs No Response trend) - POST: '/filteredResponseTrend'
+router.post('/filteredResponseTrend', function(req,res) {
+    
+    console.log('req.body');
+    console.log(JSON.stringify(req.body));
+    let survey_id = req.body.survey_id;
+    let filterCity = req.body.filterCity;
+    let filterGender = req.body.filterGender;
+
+
+    let getFilteredResonseTrend = `CALL getFilteredResponseTrend(?, ?, ?)`;
+
+    mysql.pool.getConnection(function (err, connection) {
+        if (err) {
+            return res.status(400).send(responseJSON("SERVER_someError"));
+        }
+
+        // successful connection...
+        connection.query(getFilteredResonseTrend, [survey_id, filterCity, filterGender], function (err, rows) {
+            if (err) {
+                logger.error(err);
+                connection.release();
+                return res.status(400).send(responseJSON("SERVER_someError"));
+            }
+
+            if (rows.length > 0) {
+                
+                res.status(200).send({survey_data: rows, message: "Surveys sent"});
+            } else {
+                // No matching data.
+                res.status(400).send(responseJSON("NO_DATA"));
+            }
+
+            // Release the connection
+            connection.release();
+        });
+    });
+});
 
 // Dashboard Survey Statistics (Options trend) - POST: '/surveyOptionTrend'
 router.post('/surveyOptionTrend', function(req,res) {
@@ -162,16 +242,18 @@ router.post('/surveyOptionTrend', function(req,res) {
                                                 "WHERE survey_id = ? ) " +
                     "group by question_id, option_id";
 
+                    //q.qtype <> 'TEXT' && 'Date
+
     mysql.pool.getConnection(function (err, connection) {
         if (err) {
+            logger.error(err);
             return res.status(400).send(responseJSON("SERVER_someError"));
         }
 
         // successful connection...
         connection.query(getOptionsTrend, [survey_id], function (err, rows) {
             if (err) {
-                console.log('err');
-                console.log(err);                
+                logger.error(err);               
                 connection.release();
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
@@ -190,8 +272,7 @@ router.post('/surveyOptionTrend', function(req,res) {
                     // successful connection...
                     connection2.query(getOptionsDetails, [survey_id], function (err, rows2) {
                         if (err) {
-                            console.log('err');
-                            console.log(err);
+                            logger.error(err);
                             connection2.release();
                             return res.status(400).send(responseJSON("SERVER_someError"));
                         }
@@ -242,6 +323,71 @@ router.post('/surveyOptionTrend', function(req,res) {
         });
     });
 });
+
+// Dashboard Survey Statistics (Filtered Options trend) - POST: '/filteredOptionTrend'
+router.post('/filteredOptionTrend', function(req,res) {
+    
+    console.log('req.body');
+    console.log(JSON.stringify(req.body));
+    let survey_id = req.body.survey_id;
+    let filterCity = req.body.filterCity;
+    let filterGender = req.body.filterGender;
+          
+    let getFilteredOptionTrend = `CALL getFilteredOptionTrend(?, ?, ?)`;
+
+    mysql.pool.getConnection(function (err, connection) {
+        if (err) {
+            logger.error(err);
+            return res.status(400).send(responseJSON("SERVER_someError"));
+        }
+
+        // successful connection...
+        connection.query(getFilteredOptionTrend, [survey_id, filterCity, filterGender], function (err, rows1) {
+            if (err) {
+                logger.error(err);
+                connection.release();
+                return res.status(400).send(responseJSON("SERVER_someError"));
+            }
+            console.log("========rows1============");
+
+            var rows2 = rows1[0];
+            if (rows2.length > 0) {
+
+                let tempResult = [];
+                rows2.map((row) => {
+
+                    let element = {
+                        question_id: row.q_id,
+                        option_id: row.id,
+                        option_value: row.value,
+                        question_text: row.qtext,
+                        option_count: 0
+                    }
+
+                    if(row.option_count !== null) {
+                        element = {
+                            question_id: row.q_id,
+                            option_id: row.id,
+                            option_value: row.value,
+                            question_text: row.qtext,
+                            option_count: row.option_count
+                        }
+                    }
+                    
+                    tempResult.push(element);
+                });
+                res.status(200).send({survey_data: tempResult, message: "Surveys sent"});
+            } else {
+                // No matching data.
+                res.status(400).send(responseJSON("NO_DATA"));
+            }
+
+            // Release the connection
+            connection.release();
+        });
+    });
+});
+
 function responseJSON(responseType) {
     switch (responseType) {
         case "INVALID_session":

@@ -5,15 +5,22 @@
     overflow: hidden;
   }
   
-  .ant-carousel .slick-slide {
-    color: #fff;
-  }
+.ant-carousel .slick-slide {
+  color: #fff;
+}
 
-  .ant-carousel .slick-slider .slick-dots li {
-    background: #001529;
-  }
+.ant-carousel .slick-slider .slick-dots li {
+  background: #001529;
+}
 
-  .ant-carousel .slick-dots li.slick-active button {
-    background: #e6e1e1;
-  }
-  
+.ant-carousel .slick-dots li.slick-active button {
+  background: #e6e1e1;
+}
+
+.filter_div {
+  margin-top: 10%;
+  overflow: auto;
+  background-color: white;
+  width: 100%;
+  text-align: center
+}
