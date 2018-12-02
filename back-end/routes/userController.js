@@ -6,13 +6,14 @@ const DATABASE_POOL = require('../mysql/mysql');
 // REGISTRATION - POST: '/register'
 exports.registerUser = function registerUser(req, res) {
 
-    let user = {
-        "username"  : req.body.username,
+    let newUser = {
         "email"     : req.body.email,
         "password"  : req.body.password,
+        "fname"     : req.body.fname,
+        "lname"     : req.body.lname,
     };
 
-    let insertQuery = "INSERT INTO users SET ?";
+    let insertQuery = "INSERT INTO USER SET ?";
 
     if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
@@ -20,19 +21,16 @@ exports.registerUser = function registerUser(req, res) {
                 return res.status(400).send(responseJSON("SERVER_someError"));
 
             bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(user.password, salt, (err, hash) => {
+                bcrypt.hash(newUser.password, salt, (err, hash) => {
                     // Store hash in database
-                    user.password = hash;
+                    newUser.password = hash;
 
                     // if you got a connection...
-                    connection.query(insertQuery, user, function (err, rows) {
+                    connection.query(insertQuery, newUser, function (err, rows) {
                         if (err) {
                             connection.release();
                             if (err.code === "ER_DUP_ENTRY") {
-                                if (err.sqlMessage.match(/email_UNIQUE/g) == "email_UNIQUE")
-                                    return res.status(400).send(responseJSON("REG_errorEmail"));
-                                else if (err.sqlMessage.match(/username_UNIQUE/g) == "username_UNIQUE")
-                                    return res.status(400).send(responseJSON("REG_errorUsername"));
+                                return res.status(400).send(responseJSON("REG_errorEmail"));
                             } else
                                 return res.status(400).send(responseJSON("SERVER_someError"));
                         }
@@ -46,38 +44,18 @@ exports.registerUser = function registerUser(req, res) {
                 });
             });
         });
-    } else {
-
-        bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(user.password, salt, (err, hash) => {
-                // Store hash in database
-                user.password = hash;
-                mysql.fetchObjData(function (err, rows) {
-                    if (err) {
-                        if (err.code === "ER_DUP_ENTRY") {
-                            if (err.sqlMessage.match(/email_UNIQUE/g) == "email_UNIQUE")
-                                return res.status(400).send(responseJSON("REG_errorEmail"));
-                            else if (err.sqlMessage.match(/username_UNIQUE/g) == "username_UNIQUE")
-                                return res.status(400).send(responseJSON("REG_errorUsername"));
-                        } else
-                            return res.status(400).send(responseJSON("SERVER_someError"));
-                    }
-                    // User registered successfully.
-                    res.status(200).send(responseJSON("REG_successMsg"));
-                }, user, insertQuery);
-            });
-        });
     }
 }
 
 // LOGIN - POST: '/login'
 exports.loginUser = function authenticateUser(req, res) {
 
-    let username = req.body.username;
+    let email = req.body.email;
     let password = req.body.password;
 
-    let getUser = "SELECT * FROM users " +
-        "WHERE username = ?";
+
+    let getUser =  "SELECT email, password, fname, lname, education, addr1, addr2, state, city, zip, gender, birthdate FROM USER " +
+        "WHERE email = ?";
 
     if(DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
@@ -85,17 +63,19 @@ exports.loginUser = function authenticateUser(req, res) {
                 return res.status(400).send(responseJSON("SERVER_someError"));
 
             // if you got a connection...
-            connection.query(getUser, [username], function (err, rows) {
+            connection.query(getUser, [email], function (err, rows) {
                 if (err) {
                     connection.release();
                     return res.status(400).send(responseJSON("SERVER_someError"));
                 }
 
+
                 if (rows.length > 0) {
                     bcrypt.compare(password, rows[0].password, function (err, resp) {
                         if (resp) {
+
                             // Passwords match && User was found.
-                            req.session.user = username;
+                            req.session.email = email;
                             res.status(200).send({user: rows[0], message: "Login Successful"});
                         } else {
                             // Passwords don't match
@@ -110,37 +90,16 @@ exports.loginUser = function authenticateUser(req, res) {
                 connection.release();
             });
         });
-    } else {
-        mysql.fetchObjData(function (err, rows) {
-            if (err) {
-                return res.status(400).send(responseJSON("SERVER_someError"));
-            }
-
-            if (rows.length > 0) {
-                bcrypt.compare(password, rows[0].password, function (err, resp) {
-                    if (resp) {
-                        // Passwords match && User was found.
-                        req.session.user = username;
-                        res.status(200).send({user: rows[0], message: "Login Successful"});
-                    } else {
-                        // Passwords don't match
-                        res.status(401).send(responseJSON("INVALID_login"));
-                    }
-                });
-            }
-            else // User doesn't exist.
-                res.status(400).send(responseJSON("INVALID_user"));
-        }, [username], getUser);
     }
 }
 
 // SESSION CHECK - POST: '/authenticateUser'
 exports.authenticateUser = function authenticateUser(req, res) {
 
-    let username    = req.body.sessionUsername;
+    let email    = req.body.sessionEmail;
 
-    let authUser    =   "SELECT * FROM users " +
-                        "WHERE username = ?";
+    let authUser    =   "SELECT email, fname, lname, education, addr1, addr2, state, city, zip, gender, birthdate FROM USER " +
+                        "WHERE email = ?";
 
     if(DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
@@ -148,7 +107,7 @@ exports.authenticateUser = function authenticateUser(req, res) {
                 return res.status(400).send(responseJSON("SERVER_someError"));
 
             // if you got a connection...
-            connection.query(authUser, [username], function (err, rows) {
+            connection.query(authUser, [email], function (err, rows) {
                 if (err) {
                     connection.release();
                     return res.status(400).send(responseJSON("SERVER_someError"));
@@ -164,18 +123,6 @@ exports.authenticateUser = function authenticateUser(req, res) {
                 connection.release();
             });
         });
-    } else {
-        mysql.fetchObjData(function (err, rows) {
-            if (err) {
-                return res.status(400).send(responseJSON("SERVER_someError"));
-            }
-            if (rows.length > 0) {
-                // User found.
-                res.status(200).send({user: rows[0], message: "Authentication Successful!"});
-            }
-            else // User doesn't exist. Hence, invalid session.
-                res.status(401).send(responseJSON("INVALID_session"));
-        }, [username], authUser);
     }
 }
 
@@ -193,6 +140,45 @@ exports.logoutUser = function logoutUser(req, res) {
 
 }
 
+// REGISTRATION - POST: '/'
+exports.updateProfile = function updateProfile(req, res) {
+
+    let newUser = {
+        "email": req.body.sessionEmail,
+        "city": req.body.city,
+        "gender": req.body.gender,
+        "state": req.body.state,
+        "zip": req.body.zip,
+    };
+
+    let insertQuery = `UPDATE USER
+                        SET state = ${newUser.state}, city = ${newUser.city}, zip=${newUser.zip}, gender=${newUser.gender}
+                       WHERE email=${newUser.email}`;
+
+    if (DATABASE_POOL) {
+        mysql.pool.getConnection(function (err, connection) {
+            if (err)
+                return res.status(400).send(responseJSON("SERVER_someError"));
+                    // if you got a connection...
+                    connection.query(insertQuery, function (err, rows) {
+                        if (err) {
+                            connection.release();
+                            return res.status(400).send(responseJSON("SERVER_someError"));
+                        }
+                        console.log("-----");
+                        console.log(rows);
+                        console.log("-----");
+                        // User registered successfully.
+                        res.status(200).send(responseJSON("REG_successMsg"));
+
+                        // Release the connection
+                        connection.release();
+                    });
+
+        });
+    }
+}
+
 function responseJSON(responseType) {
     switch (responseType) {
         case "INVALID_session":
@@ -205,6 +191,8 @@ function responseJSON(responseType) {
             return { message: "This email address is already in use." };
         case "SERVER_someError":
             return { message: 'There is some issue in server. Please try again later.' };
+        case "REG_successProfileUpdate":
+            return { message: "The profile has been updated" };
         case "INVALID_login":
             return { message: "The username and password you entered did not match our records. Please double-check and try again." };
         case "INVALID_user":

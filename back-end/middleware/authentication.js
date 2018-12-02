@@ -1,10 +1,10 @@
 authenticate = (req, res, next) => {
 
-    if(!req.session.user) {
+    if(!req.session.email) {
         console.log("USER SESSION INVALID");
         res.status(401).send(respondAuth("invalidSession"));
     } else {
-        req.body.sessionUsername = req.session.user;
+        req.body.sessionEmail = req.session.email;
         next();
     }
 };
