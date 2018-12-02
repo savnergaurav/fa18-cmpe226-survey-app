@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { createBrowserHistory } from 'history';
+import {RESTService} from "../api";
 
 const history = createBrowserHistory();
 
@@ -10,10 +11,30 @@ export const SURVEY_CREATE_SUCCESS = 'SURVEY_CREATE_SUCCESS';
 export const SURVEY_CREATE_FAIL = 'SURVEY_CREATE_FAIL';
 export const QUESTION_CREATE_SUCCESS = 'QUESTION_CREATE_SUCCESS';
 export const QUESTION_CREATE_FAIL = 'QUESTION_CREATE_FAIL';
+export const SAVE_USER = 'SAVE_USER';
+export const LOGOUT_USER = 'LOGOUT_USER';
 
 const api = process.env.REACT_APP_CONTACTS_API_URL || 'http://localhost:3001';
 
+export function saveUser(user) {
+    return {
+        type: SAVE_USER,
+        payload: user,
+    }
+}
 
+export function logoutUser() {
+    return {
+        type: LOGOUT_USER,
+    }
+}
+
+export function authenticateUser() {
+    return dispatch => {
+
+    }
+
+}
 
 export function QuestionAdded(newQuestion){
     return{

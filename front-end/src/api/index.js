@@ -10,12 +10,31 @@ export const RESTService = {
     dashboardCreatedByYou,
     dashboardResondedByYou,
     surveyResponseTrend,
-    surveyOptionTrend
+    surveyOptionTrend,
+    signIn,
+    profile,
+    authenticateUser
+
 };
 
+function authenticateUser() {
+    let authenticateUserUrl   = api + '/authenticateUser';
+    return axiosPost(authenticateUserUrl, null);
+}
+
 function signup(user) {
-    let userSignUp = api + '/users/register';
+    let userSignUp = api + '/users/signup';
     return axiosPost(userSignUp, user);
+}
+
+function signIn(user) {
+    let userSignInUrl = api + '/users/signin';
+    return axiosPost(userSignInUrl, user);
+}
+
+function profile(user) {
+    let profileURL = api + '/users/profile';
+    return axiosPost(profileURL, user);
 }
 
 function dashboardCreatedByYou(user) {

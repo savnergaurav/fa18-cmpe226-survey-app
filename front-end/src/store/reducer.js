@@ -1,7 +1,9 @@
 import * as actionTypes from './actions';
 
 const initialState = {
-    question : []
+    question : [],
+    user: {},
+    isAuthenticated: false
 }
 
 const reducer = (state = initialState, action) => {
@@ -53,6 +55,18 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 ...state.question,
                 question : q7
+            }
+        case actionTypes.SAVE_USER:
+            return {
+                ...state,
+                ...state.user,
+                user: action.payload,
+                isAuthenticated: !!action.payload,
+            }
+        case actionTypes.LOGOUT_USER:
+            return {
+                isAuthenticated: false,
+                user: {}
             }
 
         }
