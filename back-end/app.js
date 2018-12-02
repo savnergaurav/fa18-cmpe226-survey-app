@@ -64,10 +64,14 @@ app.use('/dashboard', dashboardController);
 
 // User Controller
 // POST
-// app.post('/register', userController.registerUser);
-// app.post('/login', userController.loginUser);
+//  app.post('/register', userController.registerUser);
+app.post('/users/signup', userController.registerUser);
+app.post('/users/signin', userController.loginUser);
+app.post('/users/profile',authenticate, userController.updateProfile);
+
 // app.post('/logout', authenticate, userController.logoutUser);
-// app.post('/authenticateUser', authenticate, userController.authenticateUser);
+app.post('/authenticateUser', authenticate, userController.authenticateUser);
+
 app.post('/createSurvey', surveyController.createSurvey);
 app.post('/createQuestions', questionsController.createQuestion);
 app.post('/fetchMySurveys', surveyController.fetchMySurveys);
