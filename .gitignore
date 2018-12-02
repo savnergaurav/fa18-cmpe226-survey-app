@@ -10,3 +10,6 @@ back-end/public/profile_images
 
 # DS_STORE
 .DS_STORE
+back-end/errors.log
+back-end/info.log
+back-end/package-lock.json
