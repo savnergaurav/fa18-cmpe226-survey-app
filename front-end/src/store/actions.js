@@ -1,12 +1,17 @@
 import axios from 'axios';
+import { createBrowserHistory } from 'history';
+
+const history = createBrowserHistory();
 
 export const ADD_QUESTION = 'ADD_QUESTION';
 export const UPDATE_QUESTION = 'UPDATE_QUESTION';
 export const DELETE_QUESTION = 'DELETE_QUESTION';
 export const SURVEY_CREATE_SUCCESS = 'SURVEY_CREATE_SUCCESS';
 export const SURVEY_CREATE_FAIL = 'SURVEY_CREATE_FAIL';
+export const QUESTION_CREATE_SUCCESS = 'QUESTION_CREATE_SUCCESS';
+export const QUESTION_CREATE_FAIL = 'QUESTION_CREATE_FAIL';
 
-const api = process.env.REACT_APP_CONTACTS_API_URL || 'http://localhost:8900';
+const api = process.env.REACT_APP_CONTACTS_API_URL || 'http://localhost:3001';
 
 
 
@@ -59,7 +64,6 @@ function surveyCreateFailed(response){
     }
 }
 export function CreateSurvey(surveyDetails){
-    console.log("Inside Create Survey Action : ", surveyDetails);
     var headers = new Headers();
     headers.append('Accept', 'application/json');
     return (dispatch) => {
@@ -69,27 +73,51 @@ export function CreateSurvey(surveyDetails){
             redirect: 'follow',
             withCredentials: true,
             headers: headers,
-            data: JSON.stringify(surveyDetails)
+            data: surveyDetails
         }).then((response)=>{
             if(response.status == 200){
-                dispatch(surveyCreateSuccess(response))
+                dispatch(surveyCreateSuccess(response));
+                history.push('/question');
             }else{
                 dispatch(surveyCreateFailed(response))
             }
         })
-    }
-    
-    // const request = axios(`${api}/createSurvey`,{
-    //     method: 'post',
-    //     mode: 'no-cors',
-    //     redirect: 'follow',
-    //     withCredentials: true,
-    //     headers: headers,
-    //     data: JSON.stringify(surveyDetails)
-    // })
-    // .then(
+    }    
+}
 
-    // )
-        
+function QuestionCreateSuccess(response){
+    return{
+        type : QUESTION_CREATE_SUCCESS,
+        payload : response.data
+    }
+}
+
+function QuestionCreateFailed(response){
+    return{
+        type : QUESTION_CREATE_FAIL,
+        payload : response.data
+    }
+}
+export function CreateQuestion(questionsArr){
+    console.log("Questions Arr : ", questionsArr);
+    var headers = new Headers();
+    headers.append('Accept', 'application/json');
+    return (dispatch) => {
+        const request = axios(`${api}/createQuestions`,{
+            method: 'post',
+            mode: 'no-cors',
+            redirect: 'follow',
+            withCredentials: true,
+            headers: headers,
+            data: questionsArr
+        }).then((response)=>{
+            if(response.status == 200){
+                dispatch(surveyCreateSuccess(response));
+                // history.push('/question');
+            }else{
+                dispatch(surveyCreateFailed(response))
+            }
+        })
+    }    
 }
 
