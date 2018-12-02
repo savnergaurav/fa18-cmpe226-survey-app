@@ -1,14 +1,51 @@
 const mysql = require('../mysql/mysql');
-const DATABASE_POOL = require('../mysql/mysql');
+const {DATABASE_POOL} = require('../mysql/mysql');
+const logger = require('../config/logger');
+
+// nodemailer for mailing service
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'no.reply.saket.relan@gmail.com',
+        pass: 'CMPE273@123'
+    }
+});
+
+var mailHelper = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'do.not.reply.rohit@gmail.com',
+      pass: 'Zxcvbn~!2017'
+    }
+  });
 
 exports.createSurvey = function createSurvey(req, res) {
 
+    let url = this.guid();
+    let surveyType = '';
+    switch(req.body.surveyType) {
+        case 'Invite Only': 
+            surveyType = 'invited';
+            break;
+        case 'General': 
+            surveyType = 'general';
+            break;
+        case 'Volunteer': 
+            surveyType = 'voluntary';
+            break;            
+    }
+    let survey_url = `http://localhost:3000/response/${surveyType}/${url}`
+    console.log('url');
+    console.log(url);
     var surveyDetails = {
         "sname": req.body.surveyName,
         "sdesc": req.body.surveyDesc,
         "stype": req.body.surveyType,
         "svalidity": new Date(req.body.validDate),
         "screated_date": new Date(),
+        "surl": url,
         "screated_by": "gaurav@gmail.com"
     }
     console.log("Inside Survey Controller : ", surveyDetails);
@@ -18,12 +55,14 @@ exports.createSurvey = function createSurvey(req, res) {
         mysql.pool.getConnection(function (err, connection) {
             if (err) {
                 console.log("Error connectiong : ", err);
+                logger.error(err);
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
             else {
                 console.log("Connected");
                 connection.query(insertQuery, surveyDetails, function (err, rows) {
                     if (err) {
+                        logger.error(err);
                         connection.release();
                         return res.status(400).send(responseJSON("SERVER_someError"));
                     }
@@ -38,16 +77,35 @@ exports.createSurvey = function createSurvey(req, res) {
                                     emails += e + ",";
                             })
                             //console.log("Emails : ", emails);
+                            var mailOptions = {
+                                // to: results.value.email,
+                                from: 'youremail@gmail.com',
+                                to: req.body.inviteEmails,
+                                subject: 'You have been invited to respond to Survey!!!',
+                                text: 'Dear User,\n \nYou are invited to respond to this survey. Please click on the below link to directly respond to the survey.' +
+                                '\n\nSurvey Link: ' + survey_url
+                            };
+
+                            console.log("Mail Triggered");
+                            mailHelper.sendMail(mailOptions, function (err, info) {
+                                if (err) {
+                                    logger.error(err);
+                                    console.log(err);
+                                } else {
+                                    console.log('Email sent: ' + info.response);
+                                }
+                            });
+
+
                             let sql = `CALL insertInviteList(?)`;
                             let values = [rows.insertId, surveyDetails.screated_by, emails];
                             connection.query(sql, [values], (err, results) => {
                                 if (err) {
                                     console.log("SQL ERROR", err);
+                                    logger.error(err);
                                     connection.release();
                                     return res.status(400).send(responseJSON("SERVER_someError"));
-                                }
-                                //console.log("Rows : ", rows.insertId);
-                                // 
+                                } 
                             })
                         }
                         res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
@@ -59,6 +117,7 @@ exports.createSurvey = function createSurvey(req, res) {
     } else {
         mysql.fetchObjData(function (err, rows) {
             if (err) {
+                logger.error(err);
                 return res.status(400).send(responseJSON("SERVER_someError"));
             }
             console.log("Rows : ", rows);
@@ -67,6 +126,18 @@ exports.createSurvey = function createSurvey(req, res) {
 
     }
 }
+
+guid = () => {
+
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+          .toString(16)
+          .substring(1);
+    }
+
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();    
+}
+
 // FETCH SURVEY CREATED BY LOGGED IN USER - GET: '/fetchMySurveys'
 exports.fetchMySurveys = function fetchMySurveys(req, res) {
 
@@ -78,8 +149,10 @@ exports.fetchMySurveys = function fetchMySurveys(req, res) {
     if (DATABASE_POOL) {
 
         mysql.pool.getConnection(function (err, connection) {
-            if (err)
+            if (err) {
+                logger.error(err);
                 return res.status(400).send(responseJSON("SERVER_someError"));
+            }
 
             // if you got a connection...
             connection.query(sql, function (err, rows, fields) {

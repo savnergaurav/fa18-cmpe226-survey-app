@@ -1,5 +1,5 @@
 let mysql = require('mysql');
-const DATABASE_POOL = false;
+const DATABASE_POOL = true;
 
 let pool = mysql.createPool({
     host: 'cmpe226.cesec0b1q06m.us-east-1.rds.amazonaws.com',
@@ -13,9 +13,9 @@ let pool = mysql.createPool({
 function getConnection() {
 
     var connection = mysql.createConnection({
-        host: 'localhost',
+        host: 'cmpe226.cesec0b1q06m.us-east-1.rds.amazonaws.com',
         user: 'root',
-        password: 'rajivyadav',
+        password: 'toor*root',
         database: 'respondmedb',
         port: 3306
     });
