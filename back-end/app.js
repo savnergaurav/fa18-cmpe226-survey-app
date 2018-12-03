@@ -53,7 +53,8 @@ app.use(session({
 
 app.use(function(req,res,next){
     log.info('['+ req.method +']' + req.url);
-    log.info('[Request Body]' + req.body);
+    log.info('[Request Body]');
+    log.info(req.body)
     next();
 })
 
@@ -75,9 +76,9 @@ app.post('/authenticateUser', authenticate, userController.authenticateUser);
 
 app.post('/createSurvey', surveyController.createSurvey);
 app.post('/createQuestions', questionsController.createQuestion);
-app.post('/fetchMySurveys', surveyController.fetchMySurveys);
-app.post('/fetchSharedWithMe', surveyController.fetchSharedWithMe);
-app.post('/fetchVolunteerSurvey', surveyController.fetchVolunteerSurvey);
+app.post('/fetchMySurveys', authenticate, surveyController.fetchMySurveys);
+app.post('/fetchSharedWithMe', authenticate, surveyController.fetchSharedWithMe);
+app.post('/fetchVolunteerSurvey', authenticate, surveyController.fetchVolunteerSurvey);
 
 // Response Controller
 app.post('/response/validate-email', responseController.validateEmail);

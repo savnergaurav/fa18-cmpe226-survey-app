@@ -1,5 +1,6 @@
 const mysql = require("../mysql/mysql");
 const DATABASE_POOL = require("../mysql/mysql");
+const logger = require('../config/logger');
 
 exports.submitAnswers = function submitAnswers(req, res) {
   const { userReponse } = req.body;
@@ -103,9 +104,13 @@ exports.validateEmail = function validateEmail(req, res) {
                               SURVEY
                             WHERE surl = '${surveyUrl}'
                             AND svalidity >= NOW();`;
+
   if (DATABASE_POOL) {
     mysql.pool.getConnection(function(err, connection) {
-      if (err) return res.status(400).send(responseJSON("SERVER_someError"));
+      if (err) {
+        logger.error(`validateEmail Database Connection: ${err}`);
+        return res.status(400).send(responseJSON("SERVER_someError"));
+      }
 
       let invitedEmail = function(survey_id) {
         let inviteeEmailSql = `SELECT 
@@ -118,7 +123,10 @@ exports.validateEmail = function validateEmail(req, res) {
         return new Promise(function(resolve, reject) {
           // Check if invited
           connection.query(inviteeEmailSql, function(err, rows, fields) {
-            if (err) throw err;
+            if (err) {
+              logger.error(`inviteeEmailSql Error: ${err}`);
+              return res.status(400).send(responseJSON("SERVER_someError"));
+            }
 
             if (rows[0].cnt === 0) {
               reject(false);
@@ -132,7 +140,10 @@ exports.validateEmail = function validateEmail(req, res) {
       let outdatedSurvey = new Promise(function(resolve, reject) {
         // Check if survey is outdated
         connection.query(surveyOutdatedSql, function(err, rows, fields) {
-          if (err) throw err;
+          if (err) {
+            logger.error(`surveyOutdatedSql Error: ${err}`);
+            return res.status(400).send(responseJSON("SERVER_someError"));
+          }
 
           if (rows[0].cnt === 0) {
             reject(false);
@@ -222,9 +233,6 @@ exports.fetchQuestionsAndOptions = function fetchQuestionsAndOptions(req, res) {
         return res.status(400).send(responseJSON("SERVER_someError"));
       }
 
-      console.log("FETCH");
-      console.log(sql);
-      console.log("FETCH");
       // Fetch rows
       connection.query(sql, function(err, rows, fields) {
         if (err) {
@@ -239,10 +247,6 @@ exports.fetchQuestionsAndOptions = function fetchQuestionsAndOptions(req, res) {
           surveyDesc: "",
           questions: []
         };
-
-        console.log("----");
-        console.log(rows);
-        console.log("----");
 
         let optionsMap = new Map();
         let questionsMap = new Map();

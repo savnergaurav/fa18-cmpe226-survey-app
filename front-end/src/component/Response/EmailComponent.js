@@ -100,7 +100,7 @@ class EmailComponent extends Component {
       centered: true,
       keyboard: false,
       onOk() {
-          window.location.href="/home";
+          window.location.href="/login";
       }
     });
     this.setState({

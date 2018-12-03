@@ -107,8 +107,9 @@ class ResponseComponent extends Component {
         response => {
           console.log("RESPNSE SUCCESS");
           message.success(response.data.message);
-          // history.push("/home"); // CHANGE TO LOGIN
-          window.location.href="/home";
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 1500);
         },
         error => {
           console.log("RESPNSE ERROR");

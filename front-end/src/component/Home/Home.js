@@ -1,112 +1,213 @@
-import React, { Component } from 'react'
-import axios from 'axios';
-import ReactDOM from 'react-dom';
-import {Link} from 'react-router-dom';
-import Navbar from '../Dashboard/Navbar';
+import React, { Component } from "react";
+import axios from "axios";
+import ReactDOM from "react-dom";
+import { Link } from "react-router-dom";
+import Navbar from "../Dashboard/Navbar";
+import { Table, Divider, Tag, Button, Input, Icon, message } from "antd";
+import { connect } from "react-redux";
+import { RESTService } from "../../api";
 
-export default class Home extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            createdByMe: [],
-            sharedWithMe: [],
-            voluntary: []
+class Home extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mySurveys: [],
+      sharedWithMe: [],
+      voluntarySurveys: [],
+      userEmail: "",
+      surveyUrl: "",
+      surveyId: "",
+      tableJsx: ""
+    };
+    this.renderSurveys = this.renderSurveys.bind(this);
+  }
+
+  componentWillMount = () => {
+    const { user } = this.props;
+
+    axios
+      .post("http://localhost:3001/fetchMySurveys", {
+        email: user.email
+      })
+      .then(res => {
+        this.setState({ mySurveys: res.data.mySurveys });
+      });
+    axios
+      .post("http://localhost:3001/fetchSharedWithMe", {
+        email: user.email
+      })
+      .then(res => {
+        this.setState({ sharedWithMe: res.data.sharedWithMe });
+      });
+    axios.post("http://localhost:3001/fetchVolunteerSurvey").then(res => {
+      this.setState({ voluntarySurveys: res.data.voluntarySurveys });
+    });
+
+    setTimeout(() => {
+        this.renderSurveys("mySurveys");
+    }, 1500);
+  };
+
+  renderSurveys = (surveyType = "mySurveys") => {
+    let surveyColumns = [];
+    let surveyData = [];
+
+    if (surveyType === "mySurveys") {
+      surveyColumns = [
+        {
+          title: "Survey Name",
+          dataIndex: "surveyName",
+          key: "surveyName"
+        },
+        {
+          title: "Survey URL",
+          dataIndex: "surveyUrl",
+          key: "surveyUrl"
         }
-        this.create_list = this.create_list.bind(this);
+      ];
+      surveyData = this.state.mySurveys;
+    } else if (surveyType === "sharedWithMe") {
+      surveyColumns = [
+        {
+          title: "Survey Name",
+          dataIndex: "surveyName",
+          key: "surveyName"
+        },
+        {
+          title: "Survey URL",
+          dataIndex: "surveyUrl",
+          key: "surveyUrl"
+        }
+      ];
+      surveyData = this.state.sharedWithMe;
+    } else if (surveyType === "voluntarySurveys") {
+      surveyColumns = [
+        {
+          title: "Survey Name",
+          dataIndex: "surveyName",
+          key: "surveyName",
+          width: "10px"
+        },
+        {
+          title: "Survey URL",
+          dataIndex: "surveyUrl",
+          key: "surveyId",
+          width: "10px"
+        },
+        {
+          title: "Subscription",
+          key: "action",
+          width: 100,
+          render: (text, record) => (
+            <span>
+              <Input
+                placeholder="Enter your email"
+                prefix={
+                  <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                }
+                onChange={e => this.onChangeEmail(e, text)}
+                ref={node => (this.userEmailInput = node)}
+              />
+              <Button type="primary" onClick={this.handleSubscribe}>
+                Subscibe
+              </Button>
+            </span>
+          )
+        }
+      ];
+      surveyData = this.state.voluntarySurveys;
     }
 
-    create_list(e, arr) {
-        e.preventDefault();
-        // console.log('started');
-        if (arr.length === 0)
-            return;
-        var id = 0;
+    let jsx = <Table columns={surveyColumns} dataSource={surveyData} />;
 
-        var namesList = arr.map((name, id) => {
-            id = id + 1;
-            return <tr><td>{id}</td><td>{name.sname}</td><td>{name.surl}</td></tr>;
-        })
-        if (namesList.length === 0)
-            return;
-        // console.log('NameLIST ->', namesList);
-        // ReactDOM.render(<table>{namesList}</table>, document.getElementById("my_table"));
-        ReactDOM.render(
-            <table className="table table-bordered my_table_style">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Survey Name</th>
-                        <th>Survey URL</th>
-                    </tr>
-                </thead>
-                <tbody>{namesList}
-                </tbody>
-            </table>,
-            document.getElementById('my_table'));
-    }
+    this.setState({
+      tableJsx: jsx
+    });
+  };
 
-    componentDidMount = () => {
-        axios.post('http://localhost:3001/fetchMySurveys', {
-            email: "saket@gmail.com"
-        }).then((res) => {
-            // console.log('fetchMySurveys -> ', res.data);
-            this.setState({ createdByMe: res.data });
-        });
-        axios.post('http://localhost:3001/fetchSharedWithMe', {
-            email: "rajiv@gmail.com"
-        }).then((res) => {
-            // console.log('fetchSharedWithMe -> ', res.data);
-            this.setState({ sharedWithMe: res.data })
-        })
-        axios.post('http://localhost:3001/fetchVolunteerSurvey').then((res) => {
-            // console.log('fetchVolunteerSurvey -> ', res.data);
-            this.setState({ voluntary: res.data });
-        })
-    }
+  onChangeEmail = (event, text) => {
+    this.setState({
+      userEmail: event.target.value,
+      surveyUrl: text.surveyUrl,
+      surveyId: text.surveyId
+    });
+  };
 
-    render() {
-        return (
-            <div>
-                {/* <nav  class="navbar navbar-default">
-                <div className="container">
-                    <Link to="/home">Navbar</Link>
-                    <Link to="/profile">Profile</Link>
-                    <Link to="/create">Create Survey</Link>
-                    <Link to="/dashboard">Dashboard</Link>
+  handleSubscribe = () => {
+    const { userEmail, surveyUrl, surveyId } = this.state;
 
-                    <a to="/">Logout</a>
-                </div>
-                </nav>
-                 */}
-                <Navbar/>
-                <div className="container">
-                    <div className="row">
-                        <div className="col-md-3">
-                            <div className="dropdown">
-                                <button onClick={(e) => this.create_list(e, this.state.createdByMe)} className="btn btn-primary btn-block" type="button" data-toggle="dropdown">
-                                    My Survey
-                                </button>
-                            </div>
-                        </div>
-                        <div className="col-md-3">
-                            <div className="dropdown">
-                                <button onClick={(e) => this.create_list(e, this.state.sharedWithMe)} className="btn btn-success btn-block" type="button" data-toggle="dropdown">
-                                    Shared With Me
-                                </button>
-                            </div>
-                        </div>
-                        <div className="col-md-3">
-                            <div className="dropdown">
-                                <button onClick={(e) => this.create_list(e, this.state.voluntary)} className="btn btn-warning btn-block" type="button" data-toggle="dropdown">
-                                    Voluntary Survey
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <br />
+    let volunteerSurvey = {
+      surveyID: surveyId,
+      survey_url: surveyUrl,
+      email: userEmail
+    };
+
+    console.log("--this.handleSubscribe");
+    console.log(volunteerSurvey);
+    console.log("--this.handleSubscribe");
+    // RESTService.volunteerSubscription(userEmail).then(
+    //   response => {
+    //     console.log("RESPNSE SUCCESS");
+    //     message.success("Email sent!");
+    //   },
+    //   error => {
+    //     message.error("Subscription Error");
+    //   }
+    // );
+  };
+
+  render() {
+    const { userEmail, tableJsx, voluntarySurveys } = this.state;
+
+    return (
+      <div>
+        <Navbar />
+
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-md-3" />
+            <div className="col-md-2">
+              <Button
+                type="primary"
+                onClick={() => this.renderSurveys("mySurveys")}
+              >
+                My Surveys
+              </Button>
             </div>
-
-        )
-    }
+            <div className="col-md-2">
+              <Button
+                type="primary"
+                onClick={() => this.renderSurveys("sharedWithMe")}
+              >
+                Shared With Me
+              </Button>
+            </div>
+            <div className="col-md-2">
+              <Button
+                type="primary"
+                onClick={() => this.renderSurveys("voluntarySurveys")}
+              >
+                Voluntary
+              </Button>
+            </div>
+            <div className="col-md-3" />
+          </div>
+          <div className="row" style={{ marginTop: "5px" }}>
+            <div className="col-md-1" />
+            <div className="col-md-10">{tableJsx}</div>
+            <div className="col-md-1" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
+
+function mapStateToProps(state) {
+  const { user } = state;
+  return {
+    user
+  };
+}
+
+export default connect(mapStateToProps)(Home);

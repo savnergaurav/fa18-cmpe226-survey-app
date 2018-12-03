@@ -20,8 +20,14 @@ export const RESTService = {
     createSurvey,
     validateEmail,
     fetchQuestions,
-    submitAnswers
+    submitAnswers,
+    volunteerSubscription
 };
+
+function volunteerSubscription(volunteerSurvey) {
+    let volunteerSurveyApiUrl = api + '/subscribe';
+    return axiosPost(volunteerSurveyApiUrl, volunteerSurvey);
+}
 
 function submitAnswers(answers) {
     let submitAnswersApi = api + '/response/submit';

@@ -10,7 +10,7 @@ class Navbar extends Component{
             <nav class="navbar navbar-inverse">
                 <div class="container-fluid">
                     <ul class="nav navbar-nav">
-                        <li><Link to="/home">Home</Link></li>/li>
+                        <li><Link to="/home">Home</Link></li>
                         {isAuth ? <li><Link to="/profile">Profile</Link></li> : null}
                         {isAuth ? <li><Link to="/create">Create Survey</Link></li> : null}
                         {isAuth ? <li><Link to="/dashboard">Dashboard</Link></li> : null}
