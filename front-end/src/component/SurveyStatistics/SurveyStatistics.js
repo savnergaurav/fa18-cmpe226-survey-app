@@ -498,6 +498,7 @@ class SurveyStatistics extends Component {
                                         }
                                     </Carousel>
                                     <div className = "filter_div">
+                                        <h3 style={{ textAlign : 'left' }}> Filter By </h3>
                                         <RadioGroup onChange={this.onRadioChange} value={filterValue}>
                                             <Radio value='Gender'>Gender</Radio>
                                             <Radio value='City'>City</Radio>

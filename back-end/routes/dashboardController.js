@@ -262,7 +262,7 @@ router.post('/surveyOptionTrend', function(req,res) {
                 
                 // res.status(200).send({survey_data: rows, message: "Surveys sent"});
                 let getOptionsDetails = "SELECT * FROM `OPTION` o JOIN QUESTION q " +
-                                                                    "ON (o.q_id = q.qid) AND s_id = ? ";
+                                                                    "ON (o.q_id = q.qid) AND q.qtype IN ('Checkbox Question', 'Radio Question') AND s_id = ? ";
 
                 mysql.pool.getConnection(function (err, connection2) {
                     if (err) {
