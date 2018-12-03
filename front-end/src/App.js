@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import 'antd/dist/antd.css';
 import BasicDetails from './component/Survey/BasicDetails';
 import QuestionPreview from './component/Survey/QuestionsPreview';
 import { Router, Route } from 'react-router-dom';
@@ -11,6 +12,7 @@ import SignUp from './component/Users/SignUp';
 import {history} from "./history";
 import { connect }  from "react-redux";
 import {authenticateUser} from "./store/actions";
+import ResponseComponent from './component/Response/ResponseComponent';
 
 class App extends Component {
 
@@ -47,7 +49,7 @@ class App extends Component {
               {isAuth ?  <Route exact path="/SurveyStatistics/:surveyId" render={(props) => {
                   return <SurveyStatistics {...props} />
               }} />: <Route exact path='/SurveyStatistics/:surveyId' component={SignIn} />}
-
+              <Route exact path='/response/(general|voluntary|invited)/:surveyUrl' component={ResponseComponent} />
           </div>
       </Router>
     );

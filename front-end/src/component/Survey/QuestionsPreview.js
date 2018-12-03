@@ -52,23 +52,23 @@ class QuestionPreview extends Component {
       q = this.props.numberOfQuestion.map((ques) => {
         if(ques.qType === "Text Question"){
           return(
-            <TextQuestion id={ques.id} lab = {ques.lab}/>
+            <TextQuestion id={ques.id} lab = {ques.lab} responseMode={false}/>
           )
         }else if(ques.qType === "Radio Question"){
          return(
-           <RadioQuestion id = {ques.id} lab = {ques.lab}/>
+           <RadioQuestion id = {ques.id} lab = {ques.lab} responseMode={false}/>
          )
         }else if(ques.qType === "Checkbox Question"){
          return(
-           <Checkbox id = {ques.id} lab = {ques.lab}/>
+           <Checkbox id = {ques.id} lab = {ques.lab} responseMode={false}/>
          )
         }else if(ques.qType === "Rating Question"){
           return(
-            <RatingQuestion id = {ques.id} lab = {ques.lab}/>
+            <RatingQuestion id = {ques.id} lab = {ques.lab} responseMode={false}/>
           )
         }else if(ques.qType === "Date Question"){
           return(
-            <DateQuestion id = {ques.id} lab = {ques.lab}/>
+            <DateQuestion id = {ques.id} lab = {ques.lab} responseMode={false}/>
           )
         }
      })
