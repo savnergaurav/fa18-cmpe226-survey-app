@@ -16,8 +16,27 @@ export const RESTService = {
     filteredOptionTrend,
     signIn,
     profile,
-    authenticateUser
+    authenticateUser,
+    validateEmail,
+    fetchQuestions,
+    submitAnswers
 };
+
+function submitAnswers(answers) {
+    let submitAnswersApi = api + '/response/submit';
+    return axiosPost(submitAnswersApi, answers);
+}
+
+function validateEmail(userSurvey) {
+    let validateUser = api + '/response/validate-email';
+    return axiosPost(validateUser, userSurvey);
+}
+
+function fetchQuestions(surveyUrl) {
+    let surveyApi = api + '/response/fetch-questions';
+    return axiosPost(surveyApi, surveyUrl);
+}
+
 
 function authenticateUser() {
     let authenticateUserUrl   = api + '/authenticateUser';
