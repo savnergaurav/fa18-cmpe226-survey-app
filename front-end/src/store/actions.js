@@ -112,6 +112,12 @@ function surveyCreateSuccess(response) {
     payload: response.data
   };
 }
+function surveyCreateFailed(response) {
+  return {
+    type: SURVEY_CREATE_FAIL,
+    payload: response.data
+  };
+}
 export function CreateSurvey(surveyDetails){
     var headers = new Headers();
     headers.append('Accept', 'application/json');
@@ -126,14 +132,6 @@ export function CreateSurvey(surveyDetails){
                 dispatch(surveyCreateFailed(response))
             }
         });
-        // const request = axios(`${api}/createSurvey`,{
-        //     method: 'post',
-        //     mode: 'no-cors',
-        //     redirect: 'follow',
-        //     withCredentials: true,
-        //     headers: headers,
-        //     data: surveyDetails
-        // })
     }    
 }
 
@@ -172,36 +170,3 @@ export function CreateQuestion(questionsArr){
         })
     }    
 }
-// export function CreateSurvey(surveyDetails) {
-//   console.log("Inside Create Survey Action : ", surveyDetails);
-//   var headers = new Headers();
-//   headers.append("Accept", "application/json");
-//   return dispatch => {
-//     const request = axios(`${api}/createSurvey`, {
-//       method: "post",
-//       mode: "no-cors",
-//       redirect: "follow",
-//       withCredentials: true,
-//       headers: headers,
-//       data: JSON.stringify(surveyDetails)
-//     }).then(response => {
-//       if (response.status == 200) {
-//         dispatch(surveyCreateSuccess(response));
-//       } else {
-//         dispatch(surveyCreateFailed(response));
-//       }
-//     });
-//   };
-
-//   // const request = axios(`${api}/createSurvey`,{
-//   //     method: 'post',
-//   //     mode: 'no-cors',
-//   //     redirect: 'follow',
-//   //     withCredentials: true,
-//   //     headers: headers,
-//   //     data: JSON.stringify(surveyDetails)
-//   // })
-//   // .then(
-
-//   // )
-// }

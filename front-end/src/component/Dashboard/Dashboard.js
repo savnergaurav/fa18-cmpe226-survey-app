@@ -236,7 +236,7 @@ class Dashboard extends Component {
                                     <Column title="Validity" dataIndex="surveyValidity" key="surveyValidity"/>
                                     <Column align = 'center' title="Action" key="action" render={(text, record) => (
                                         <span>
-                                            <a href={`/SurveyStatistics/${record.key}`}> View Statistics </a>
+                                            <Link to={`/SurveyStatistics/${record.key}`}> View Statistics </Link>
                                         </span>
                                     )}
                                     />
@@ -251,7 +251,7 @@ class Dashboard extends Component {
                                     <Column title="Validity" dataIndex="surveyValidity" key="surveyValidity"/>
                                     <Column align = 'center' title="Action" key="action" render={(text, record) => (
                                         <span>
-                                            <a href={`/SurveyStatistics/${record.key}`}> View Statistics </a>
+                                            <Link to={`/SurveyStatistics/${record.key}`}> View Statistics </Link>
                                         </span>
                                     )}
                                     />

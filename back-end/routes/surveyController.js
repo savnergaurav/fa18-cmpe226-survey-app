@@ -22,127 +22,120 @@ var mailHelper = nodemailer.createTransport({
 });
 
 exports.createSurvey = function createSurvey(req, res) {
+
   let url = this.guid();
-  let surveyType = "";
-  switch (req.body.surveyType) {
-    case "Invite Only":
-      surveyType = "invited";
-      break;
-    case "General":
-      surveyType = "general";
-      break;
-    case "Volunteer":
-      surveyType = "voluntary";
-      break;
+  let surveyType = '';
+  switch(req.body.surveyType) {
+      case 'Invite Only': 
+          surveyType = 'invited';
+          break;
+      case 'General': 
+          surveyType = 'general';
+          break;
+      case 'Volunteer': 
+          surveyType = 'voluntary';
+          break;            
   }
-  let survey_url = `http://localhost:3000/response/${surveyType}/${url}`;
-  console.log("url");
+  let survey_url = `http://localhost:3000/response/${surveyType}/${url}`
+  console.log('url');
   console.log(url);
-  console.log("Re Body : ", req.body);
+  console.log("Re Body : ", req.body)
   var surveyDetails = {
-    sname: req.body.surveyName,
-    sdesc: req.body.surveyDesc,
-    stype: req.body.surveyType,
-    svalidity: new Date(req.body.validDate),
-    screated_date: new Date(),
-    surl: url,
-    screated_by: req.body.createdBy
-  };
+      "sname": req.body.surveyName,
+      "sdesc": req.body.surveyDesc,
+      "stype": req.body.surveyType,
+      "svalidity": new Date(req.body.validDate),
+      "screated_date": new Date(),
+      "surl": url,
+      "screated_by": req.body.createdBy
+  }
   console.log("Inside Survey Controller : ", surveyDetails);
   var insertQuery = "INSERT INTO SURVEY SET ?";
   if (DATABASE_POOL) {
-    console.log("NO DATABASE POOL");
-    mysql.pool.getConnection(function(err, connection) {
-      if (err) {
-        console.log("Error connectiong : ", err);
-        logger.error(err);
-        return res.status(400).send(responseJSON("SERVER_someError"));
-      } else {
-        console.log("Connected");
-        connection.query(insertQuery, surveyDetails, function(err, rows) {
+      console.log("NO DATABASE POOL");
+      mysql.pool.getConnection(function (err, connection) {
           if (err) {
-            logger.error(err);
-            connection.release();
-            return res.status(400).send(responseJSON("SERVER_someError"));
-          } else {
-            console.log("Inside Insert Success");
-            if (req.body.surveyType == "Invite Only") {
-              emails = "";
-              var len = req.body.inviteEmails.length;
-              req.body.inviteEmails.map((e, index) => {
-                if (index == len - 1) emails += e;
-                else emails += e + ",";
-              });
-              //console.log("Emails : ", emails);
-              var mailOptions = {
-                // to: results.value.email,
-                from: "youremail@gmail.com",
-                to: req.body.inviteEmails,
-                subject: "You have been invited to respond to Survey!!!",
-                text:
-                  "Dear User,\n \nYou are invited to respond to this survey. Please click on the below link to directly respond to the survey." +
-                  "\n\nSurvey Link: " +
-                  survey_url
-              };
-
-              console.log("Mail Triggered");
-              mailHelper.sendMail(mailOptions, function(err, info) {
-                if (err) {
-                  logger.error(err);
-                  console.log(err);
-                } else {
-                  console.log("Email sent: " + info.response);
-                }
-              });
-
-              let sql = `CALL insertInviteList(?)`;
-              let values = [rows.insertId, surveyDetails.screated_by, emails];
-              connection.query(sql, [values], (err, results) => {
-                if (err) {
-                  console.log("SQL ERROR", err);
-                  logger.error(err);
-                  connection.release();
-                  return res.status(400).send(responseJSON("SERVER_someError"));
-                } else {
-                  console.log("SQL ERROR else");
-                  res.status(200).send({
-                    s_id: rows.insertId,
-                    surveyName: surveyDetails.sname,
-                    message: "Survey Created Successfully"
-                  });
-                  //connection.release();
-                }
-              });
-            }
-            console.log("NO SQL ERROR");
-            res.status(200).send({
-              s_id: rows.insertId,
-              surveyName: surveyDetails.sname,
-              message: "Survey Created Successfully"
-            });
-            connection.release();
+              console.log("Error connectiong : ", err);
+              logger.error(err);
+              return res.status(400).send(responseJSON("SERVER_someError"));
           }
-        });
-      }
-    });
+          else {
+              console.log("Connected");
+              connection.query(insertQuery, surveyDetails, function (err, rows) {
+                  if (err) {
+                      logger.error(err);
+                      connection.release();
+                      return res.status(400).send(responseJSON("SERVER_someError"));
+                  }
+                  else {
+                      console.log("Inside Insert Success");
+                      if (req.body.surveyType == "Invite Only") {
+                          emails = "";
+                          var len = req.body.inviteEmails.length;
+                          req.body.inviteEmails.map((e, index) => {
+                              if (index == (len - 1))
+                                  emails += e;
+                              else
+                                  emails += e + ",";
+                          })
+                          //console.log("Emails : ", emails);
+                          var mailOptions = {
+                              // to: results.value.email,
+                              from: 'youremail@gmail.com',
+                              to: req.body.inviteEmails,
+                              subject: 'You have been invited to respond to Survey!!!',
+                              text: 'Dear User,\n \nYou are invited to respond to this survey. Please click on the below link to directly respond to the survey.' +
+                              '\n\nSurvey Link: ' + survey_url
+                          };
+
+                          console.log("Mail Triggered");
+                          mailHelper.sendMail(mailOptions, function (err, info) {
+                              if (err) {
+                                  logger.error(err);
+                                  console.log(err);
+                              } else {
+                                  console.log('Email sent: ' + info.response);
+                              }
+                          });
+
+
+                          let sql = `CALL insertInviteList(?)`;
+                          let values = [rows.insertId, surveyDetails.screated_by, emails];
+                          connection.query(sql, [values], (err, results) => {
+                              if (err) {
+                                  console.log("SQL ERROR", err);
+                                  logger.error(err);
+                                  connection.release();
+                                  return res.status(400).send(responseJSON("SERVER_someError"));
+                              }
+                              else{
+                                  console.log("SQL ERROR else");
+                                  // res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
+                                  // connection.release();
+                              }
+                          })
+                      }
+                      console.log("NO SQL ERROR");
+                      res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
+                      connection.release();
+                  }
+              });
+              // res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
+              // connection.release();
+          }
+      });
   } else {
-    mysql.fetchObjData(
-      function(err, rows) {
-        if (err) {
-          logger.error(err);
-          return res.status(400).send(responseJSON("SERVER_someError"));
-        }
-        console.log("Rows : ", rows);
-        res.status(200).send({
-          surveyName: rows[1],
-          message: "Survey Created Successfully"
-        });
-      },
-      surveyDetails,
-      insertQuery
-    );
+      mysql.fetchObjData(function (err, rows) {
+          if (err) {
+              logger.error(err);
+              return res.status(400).send(responseJSON("SERVER_someError"));
+          }
+          console.log("Rows : ", rows);
+          res.status(200).send({ surveyName: rows[1], message: "Survey Created Successfully" });
+      }, surveyDetails, insertQuery);
+
   }
-};
+}
 
 guid = () => {
   function s4() {
@@ -312,6 +305,43 @@ exports.fetchVolunteerSurvey = function fetchVolunteerSurvey(req, res) {
   }
 };
 
+exports.sendVolunteerInvite = function sendVolunteerInvite(req,res){
+    var sql = 'INSERT INTO INVITES SET ?';
+    var values = [req.body.surveyID, req.body.email,req.body.email];
+
+    if (DATABASE_POOL) {
+
+        mysql.pool.getConnection(function (err, connection) {
+            if (err)
+                return res.status(400).send(responseJSON("SERVER_someError"));
+
+            // if you got a connection...
+            connection.query(sql,[values], function (err, rows, fields) {
+                if (err) throw err;
+                // console.log(rows);
+                // send data to frontend
+                else{
+                    var mailOptions = {
+                        // to: results.value.email,
+                        from: 'youremail@gmail.com',
+                        to: req.body.email,
+                        subject: 'You have been invited to respond to Survey!!!',
+                        text: 'Dear User,\n \nYou are invited to respond to this survey. Please click on the below link to directly respond to the survey.' +
+                        '\n\nSurvey Link: ' + req.body.survey_url
+                    };
+                    mailHelper.sendMail(mailOptions, function (err, info) {
+                        if (err) {
+                            logger.error(err);
+                            console.log(err);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                }
+            })
+        })
+    }
+}
 function responseJSON(responseType) {
   switch (responseType) {
     case "INVALID_session":

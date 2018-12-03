@@ -53,13 +53,32 @@ exports.createQuestion = function createQuestion(req,res){
                                     
                                 })
                             }
+                            else if(question.qType == "Rating Question"){
+                                // let values = [question.rating,rows.insertId];
+                                let rating = question.rating;
+                                let optionObj = {
+                                    value: rating.toString(10),
+                                    q_id: rows.insertId
+                                };
+                                var insertQuery = 'INSERT INTO respondmedb.OPTION SET ?';
+                                connection.query(insertQuery,optionObj,(err,results) =>{
+                                    if(err){
+                                        console.log("SQL ERROR",err);
+                                        connection.release();
+                                        return res.status(400).send(responseJSON("SERVER_someError"));
+                                    }
+                                    else{
+                                        console.log("Inside SQL ERROR ELSE");
+                                    }
+                                })
+                            }
                             console.log("SUCESS Outer");
                             //res.status(200).send({message: "Questions Created Successfully"});
                             //connection.release();
                         }
                     })
                 })
-               res.status(200).send({message: "Questions Created Successfully"});
+                res.status(200).send({message: "Questions Created Successfully"});
                 connection.release(); 
 
             }

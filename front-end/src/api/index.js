@@ -21,7 +21,8 @@ export const RESTService = {
     validateEmail,
     fetchQuestions,
     submitAnswers,
-    volunteerSubscription
+    volunteerSubscription,
+    logout
 };
 
 function volunteerSubscription(volunteerSurvey) {
@@ -105,6 +106,11 @@ function getUserCities() {
     return axios.get(getUserCities)
         .then(handleSuccess)
         .catch(handleError);
+}
+
+function logout() {
+    let url = api + '/logout';
+    return axiosPost(url);
 }
 
 function axiosPost(url, data) {
