@@ -73,6 +73,7 @@ class RateQuestion extends Component {
     var rate1 = parseInt(rate, 10);
 
     const { rating } = this.state;
+    console.log("Stars : ",rate1);
     return (
       <div>
         {responseMode && (

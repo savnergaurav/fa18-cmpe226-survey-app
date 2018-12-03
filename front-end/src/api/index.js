@@ -20,7 +20,8 @@ export const RESTService = {
     createSurvey,
     validateEmail,
     fetchQuestions,
-    submitAnswers
+    submitAnswers,
+    logout
 };
 
 function submitAnswers(answers) {
@@ -99,6 +100,11 @@ function getUserCities() {
     return axios.get(getUserCities)
         .then(handleSuccess)
         .catch(handleError);
+}
+
+function logout() {
+    let url = api + '/logout';
+    return axiosPost(url);
 }
 
 function axiosPost(url, data) {

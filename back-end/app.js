@@ -70,7 +70,7 @@ app.post('/users/signup', userController.registerUser);
 app.post('/users/signin', userController.loginUser);
 app.post('/users/profile',authenticate, userController.updateProfile);
 
-// app.post('/logout', authenticate, userController.logoutUser);
+app.post('/logout', authenticate, userController.logoutUser);
 app.post('/authenticateUser', authenticate, userController.authenticateUser);
 
 app.post('/createSurvey', surveyController.createSurvey);
@@ -83,6 +83,7 @@ app.post('/fetchVolunteerSurvey', surveyController.fetchVolunteerSurvey);
 app.post('/response/validate-email', responseController.validateEmail);
 app.post('/response/fetch-questions', responseController.fetchQuestionsAndOptions);
 app.post('/response/submit', responseController.submitAnswers);
+app.post('/subscribe', surveyController.sendVolunteerInvite);
 // // Profile Controller
 // // POST
 // app.post('/profile/save-profile-image', uploadProfileImage.any(), authenticate, profileController.uploadProfImage);

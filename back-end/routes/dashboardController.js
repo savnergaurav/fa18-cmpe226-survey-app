@@ -237,7 +237,7 @@ router.post('/surveyOptionTrend', function(req,res) {
 
     let getOptionsTrend = "SELECT qtext, question_id, option_id, count(id) option_count " +
                         "FROM RESPONSE_DETAIL rd1 JOIN QUESTION q " +
-                                                                "ON (rd1.question_id = q.qid) AND q.qtype <> 'TEXT' "+
+                                                                "ON (rd1.question_id = q.qid) AND q.qtype IN ('Checkbox Question', 'Radio Question')  "+
                     "WHERE response_id IN ( SELECT id FROM RESPONSE " +
                                                 "WHERE survey_id = ? ) " +
                     "group by question_id, option_id";

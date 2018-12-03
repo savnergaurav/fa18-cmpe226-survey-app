@@ -110,8 +110,8 @@ exports.createSurvey = function createSurvey(req, res) {
                                 }
                                 else{
                                     console.log("SQL ERROR else");
-                                    res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
-                                    //connection.release();
+                                    // res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
+                                    // connection.release();
                                 }
                             })
                         }
@@ -120,6 +120,8 @@ exports.createSurvey = function createSurvey(req, res) {
                         connection.release();
                     }
                 });
+                // res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
+                // connection.release();
             }
         });
     } else {
@@ -219,6 +221,43 @@ exports.fetchVolunteerSurvey = function fetchVolunteerSurvey(req, res) {
     }
 }
 
+exports.sendVolunteerInvite = function sendVolunteerInvite(req,res){
+    var sql = 'INSERT INTO INVITES SET ?';
+    var values = [req.body.surveyID, req.body.email,req.body.email];
+
+    if (DATABASE_POOL) {
+
+        mysql.pool.getConnection(function (err, connection) {
+            if (err)
+                return res.status(400).send(responseJSON("SERVER_someError"));
+
+            // if you got a connection...
+            connection.query(sql,[values], function (err, rows, fields) {
+                if (err) throw err;
+                // console.log(rows);
+                // send data to frontend
+                else{
+                    var mailOptions = {
+                        // to: results.value.email,
+                        from: 'youremail@gmail.com',
+                        to: req.body.email,
+                        subject: 'You have been invited to respond to Survey!!!',
+                        text: 'Dear User,\n \nYou are invited to respond to this survey. Please click on the below link to directly respond to the survey.' +
+                        '\n\nSurvey Link: ' + req.body.survey_url
+                    };
+                    mailHelper.sendMail(mailOptions, function (err, info) {
+                        if (err) {
+                            logger.error(err);
+                            console.log(err);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                }
+            })
+        })
+    }
+}
 function responseJSON(responseType) {
     switch (responseType) {
         case "INVALID_session":
