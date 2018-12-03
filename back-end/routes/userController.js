@@ -2,6 +2,7 @@
 const bcrypt        = require('bcryptjs');
 const mysql         = require('../mysql/mysql');
 const DATABASE_POOL = require('../mysql/mysql');
+const logger = require("../config/logger");
 
 // REGISTRATION - POST: '/register'
 exports.registerUser = function registerUser(req, res) {
@@ -129,7 +130,7 @@ exports.authenticateUser = function authenticateUser(req, res) {
 // LOGOUT - POST: '/logout'
 exports.logoutUser = function logoutUser(req, res) {
 
-    if(req.session.user) {
+    if(req.session.email) {
         req.session.destroy();
         console.log("LOGGED OUT: Session Invalidated" + '\n');
         res.status(200).send(responseJSON("LOGOUT_success"));
@@ -152,8 +153,8 @@ exports.updateProfile = function updateProfile(req, res) {
     };
 
     let insertQuery = `UPDATE USER
-                        SET state = ${newUser.state}, city = ${newUser.city}, zip=${newUser.zip}, gender=${newUser.gender}
-                       WHERE email=${newUser.email}`;
+                        SET state = '${newUser.state}', city = '${newUser.city}', zip=${newUser.zip}, gender='${newUser.gender}'
+                       WHERE email='${newUser.email}'`;
 
     if (DATABASE_POOL) {
         mysql.pool.getConnection(function (err, connection) {
@@ -162,6 +163,7 @@ exports.updateProfile = function updateProfile(req, res) {
                     // if you got a connection...
                     connection.query(insertQuery, function (err, rows) {
                         if (err) {
+                            logger.error(err);
                             connection.release();
                             return res.status(400).send(responseJSON("SERVER_someError"));
                         }

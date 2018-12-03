@@ -112,12 +112,7 @@ function surveyCreateSuccess(response) {
     payload: response.data
   };
 }
-function surveyCreateFailed(response) {
-  return {
-    type: SURVEY_CREATE_FAIL,
-    payload: response.data
-  };
-}
+
 export function CreateSurvey(surveyDetails){
     var headers = new Headers();
     headers.append('Accept', 'application/json');

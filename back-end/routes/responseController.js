@@ -1,6 +1,17 @@
 const mysql = require("../mysql/mysql");
 const DATABASE_POOL = require("../mysql/mysql");
-const logger = require('../config/logger');
+const logger = require("../config/logger");
+
+// nodemailer for mailing service
+var nodemailer = require("nodemailer");
+
+var mailHelper = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "do.not.reply.rohit@gmail.com",
+    pass: "Zxcvbn~!2017"
+  }
+});
 
 exports.submitAnswers = function submitAnswers(req, res) {
   const { userReponse } = req.body;
@@ -9,7 +20,7 @@ exports.submitAnswers = function submitAnswers(req, res) {
   let survey_id = userReponse.survey_id;
   let user_email =
     userReponse.user_email.length > 0 ? userReponse.user_email : null;
-
+  let surveyType = userReponse.surveyType;
   let responses = userReponse.responses;
 
   let responseInsert = "";
@@ -26,7 +37,7 @@ exports.submitAnswers = function submitAnswers(req, res) {
   if (DATABASE_POOL) {
     mysql.pool.getConnection(function(err, connection) {
       if (err) {
-        console.log(err);
+        logger.error(err);
         return res.status(400).send(responseJSON("SERVER_someError"));
       }
 
@@ -34,7 +45,7 @@ exports.submitAnswers = function submitAnswers(req, res) {
         // Insert Response
         connection.query(responseInsert, function(err, rows) {
           if (err) {
-            console.log(err);
+            logger.error(err);
             return res.status(400).send(responseJSON("SERVER_someError"));
           }
           console.log(rows);
@@ -73,12 +84,64 @@ exports.submitAnswers = function submitAnswers(req, res) {
               responseDetailObj,
               function(err, rows) {
                 if (err) {
-                  console.log(err);
+                  logger.error(err);
                 }
                 console.log(rows);
               }
             );
           }
+
+          let invitedReward = new Promise((resolve, reject) => {
+            console.log("INSIDE PROMISE");
+            let rewardSql = `SELECT token FROM REWARDS WHERE user_email = '${user_email}' AND survey_id = ${survey_id} AND coupon_used = 'N'`;
+            connection.query(rewardSql, function(err, rows) {
+              if (err) {
+                logger.error(err);
+              }
+              console.log(rows[0]);
+              if (rows.length > 0) {
+                console.log("GOT TOKEN");
+                console.log(rows[0].token);
+                resolve(rows[0].token);
+              } else {
+                reject(false);
+              }
+            });
+          });
+
+          if (surveyType === "invited") {
+            console.log("INSIDE IF");
+            invitedReward
+              .then(token => {
+                let updateReward = `UPDATE REWARDS SET coupon_used = 'Y' WHERE user_email = '${user_email}' AND survey_id = ${survey_id}`;
+
+                connection.query(updateReward, function(err, rows) {
+                  if (err) {
+                    logger.error(err);
+                  }
+                  var mailOptions = {
+                    from: "youremail@gmail.com",
+                    to: user_email,
+                    subject: "You have been invited to respond to Survey!!!",
+                    text:
+                      "Dear User,\n Here is your reward for response to the survey. Please use below token." +
+                      "\nToken: " +
+                      token
+                  };
+
+                  console.log("Mail Triggered");
+                  mailHelper.sendMail(mailOptions, function(err, info) {
+                    if (err) {
+                      logger.error(err);
+                    } else {
+                      console.log("Email sent: " + info.response);
+                    }
+                  });
+                });
+              })
+              .catch(isInvalid => {});
+          }
+
           return res.status(200).send({
             message: "Congratulations! You have submitted the survey!"
           });

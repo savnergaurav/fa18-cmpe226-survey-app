@@ -145,19 +145,19 @@ class Home extends Component {
     console.log("--this.handleSubscribe");
     console.log(volunteerSurvey);
     console.log("--this.handleSubscribe");
-    // RESTService.volunteerSubscription(userEmail).then(
-    //   response => {
-    //     console.log("RESPNSE SUCCESS");
-    //     message.success("Email sent!");
-    //   },
-    //   error => {
-    //     message.error("Subscription Error");
-    //   }
-    // );
+    RESTService.volunteerSubscription(volunteerSurvey).then(
+      response => {
+        console.log("RESPNSE SUCCESS");
+        message.success("Email sent!");
+      },
+      error => {
+        message.error("Subscription Error");
+      }
+    );
   };
 
   render() {
-    const { userEmail, tableJsx, voluntarySurveys } = this.state;
+    const { tableJsx } = this.state;
 
     return (
       <div>

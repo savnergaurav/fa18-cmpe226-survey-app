@@ -307,7 +307,12 @@ exports.fetchVolunteerSurvey = function fetchVolunteerSurvey(req, res) {
 
 exports.sendVolunteerInvite = function sendVolunteerInvite(req,res){
     var sql = 'INSERT INTO INVITES SET ?';
-    var values = [req.body.surveyID, req.body.email,req.body.email];
+
+    let volunteerObj = {
+      s_id: req.body.surveyID,
+      user_email: req.body.email,
+      invite_email: req.body.email
+    }
 
     if (DATABASE_POOL) {
 
@@ -316,7 +321,7 @@ exports.sendVolunteerInvite = function sendVolunteerInvite(req,res){
                 return res.status(400).send(responseJSON("SERVER_someError"));
 
             // if you got a connection...
-            connection.query(sql,[values], function (err, rows, fields) {
+            connection.query(sql,volunteerObj, function (err, rows, fields) {
                 if (err) throw err;
                 // console.log(rows);
                 // send data to frontend

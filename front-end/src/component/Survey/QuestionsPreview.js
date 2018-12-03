@@ -11,7 +11,7 @@ import DateQuestion from '../Questions/DateQuestion';
 import {QuestionAdded} from '../../store/actions';
 import {CreateQuestion} from '../../store/actions';
 import Navbar from '../Dashboard/Navbar';
-
+import {history} from '../../history'
 class QuestionPreview extends Component {
   drop = (event) => {
     var options = ["1","2","3","4"];
@@ -44,6 +44,7 @@ class QuestionPreview extends Component {
         "surveyID" : this.props.surveyID
       }
       this.props.onSubmitClicked(questionsArr);
+      history.push("/home");
   }
   render() {
     let q = null;

@@ -53,8 +53,8 @@ app.use(session({
 
 app.use(function(req,res,next){
     log.info('['+ req.method +']' + req.url);
-    log.info('[Request Body]');
-    log.info(req.body)
+    log.info('[Request Body]', JSON.stringify(req.body));
+    log.info(JSON.stringify(req.body))
     next();
 })
 

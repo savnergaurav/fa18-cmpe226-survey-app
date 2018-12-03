@@ -77,6 +77,7 @@ class ResponseComponent extends Component {
       let userReponse = {
         user_email: userEmail,
         survey_id: surveyId,
+        surveyType: surveyType,
         responses: []
       };
 
