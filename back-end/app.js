@@ -19,6 +19,7 @@ var questionsController = require('./routes/questionController');
 var dashboardController = require('./routes/dashboardController');
 const log = require('./config/logger');
 
+var responseController = require('./routes/responseController');
 
 // Express App
 var app = express();
@@ -78,7 +79,10 @@ app.post('/fetchMySurveys', surveyController.fetchMySurveys);
 app.post('/fetchSharedWithMe', surveyController.fetchSharedWithMe);
 app.post('/fetchVolunteerSurvey', surveyController.fetchVolunteerSurvey);
 
-
+// Response Controller
+app.post('/response/validate-email', responseController.validateEmail);
+app.post('/response/fetch-questions', responseController.fetchQuestionsAndOptions);
+app.post('/response/submit', responseController.submitAnswers);
 // // Profile Controller
 // // POST
 // app.post('/profile/save-profile-image', uploadProfileImage.any(), authenticate, profileController.uploadProfImage);
