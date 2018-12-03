@@ -16,12 +16,18 @@ export const RESTService = {
     filteredOptionTrend,
     signIn,
     profile,
-    authenticateUser
+    authenticateUser,
+    createSurvey,
 };
 
 function authenticateUser() {
     let authenticateUserUrl   = api + '/authenticateUser';
     return axiosPost(authenticateUserUrl, null);
+}
+
+function createSurvey(surveyDetails) {
+    let createSurveyUrl   = api + '/createSurvey';
+    return axiosPost(createSurveyUrl, surveyDetails);
 }
 
 function signup(user) {

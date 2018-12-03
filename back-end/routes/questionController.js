@@ -27,6 +27,7 @@ exports.createQuestion = function createQuestion(req,res){
                             connection.release();
                             return res.status(400).send(responseJSON("SERVER_someError"));
                         }else{
+                            console.log("INSIDE ELSE");
                             if(question.qType == "Radio Question" || question.qType == "Checkbox Question"){
                                 var op = "";
                                 var len = question.options.length;
@@ -44,15 +45,23 @@ exports.createQuestion = function createQuestion(req,res){
                                         connection.release();
                                         return res.status(400).send(responseJSON("SERVER_someError"));
                                     }
-                                    res.status(200).send({message: "Questions Created Successfully"});
-                                    connection.release();
+                                    else{
+                                        console.log("Inside SQL ERROR ELSE")
+                                        // res.status(200).send({message: "Questions Created Successfully"});
+                                        // connection.release();
+                                    }
+                                    
                                 })
                             }
-                            // res.status(200).send({message: "Questions Created Successfully"});
-                            // connection.release();
+                            console.log("SUCESS Outer");
+                            //res.status(200).send({message: "Questions Created Successfully"});
+                            //connection.release();
                         }
                     })
                 })
+               res.status(200).send({message: "Questions Created Successfully"});
+                connection.release(); 
+
             }
         });
     } else {

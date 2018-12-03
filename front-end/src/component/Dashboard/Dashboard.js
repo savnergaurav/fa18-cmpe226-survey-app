@@ -5,6 +5,7 @@ import 'antd/dist/antd.css';
 import { Layout, Menu, Icon, Table } from 'antd';
 import Chart from "react-google-charts";
 import {RESTService} from "../../api/index";
+import {Link} from 'react-router-dom';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Column, ColumnGroup } = Table;
@@ -24,8 +25,11 @@ class Dashboard extends Component {
     componentDidMount() {
 
         let user = {
-            username: "relansaket@gmail.com"
+            // username: "relansaket@gmail.com"
+            username : this.props.user.email
+            
         }
+        console.log("Username : ", user.username);
 
         RESTService.dashboardCreatedByYou( user ).then(response => {
             this.setState({
@@ -187,9 +191,9 @@ class Dashboard extends Component {
             <Layout>
                 <Header className="header">
                     <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ lineHeight: '64px' }}>
-                        <Menu.Item key="1"><a href={`/home`}> Home </a> </Menu.Item>
-                        <Menu.Item key="2"><a href={`/dashboard`}> Dashboard </a> </Menu.Item>
-                        <Menu.Item key="3"><a href={`/`}> Create Survey </a> </Menu.Item>
+                        <Menu.Item key="1"><Link to={`/home`}> Home </Link> </Menu.Item>
+                        <Menu.Item key="2"><Link to={`/dashboard`}> Dashboard </Link> </Menu.Item>
+                        <Menu.Item key="3"><Link to={`/create`}> Create Survey </Link> </Menu.Item>
                     </Menu>
                 </Header>
                 <Content>
@@ -261,4 +265,12 @@ class Dashboard extends Component {
     }
 }
 
-export default Dashboard;
+function mapStateToProps(state) {
+
+    const { user } = state;
+    return {
+        user
+    };
+}
+
+export default connect(mapStateToProps)(Dashboard);

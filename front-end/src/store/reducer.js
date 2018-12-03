@@ -68,8 +68,23 @@ const reducer = (state = initialState, action) => {
                 isAuthenticated: false,
                 user: {}
             }
+            case actionTypes.SURVEY_CREATE_SUCCESS:
+            console.log("Survey Create Success");
+            return{
+                ...state,
+                surveyName : action.payload.surveyName,
+                surveyID : action.payload.s_id
+            }
+        
+        case actionTypes.SURVEY_CREATE_FAIL:
+            console.log("Survey Create Failed");
+            return{
+                state
+            }
+
 
         }
+        
     
     return state;
 }

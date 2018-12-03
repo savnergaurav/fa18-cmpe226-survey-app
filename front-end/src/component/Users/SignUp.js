@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { RESTService } from "../../api";
 import { message } from 'antd';
 import {history} from "../../history";
+import Navbar from '../Dashboard/Navbar';
 
 class SignUp extends Component {
     state = {
@@ -67,11 +68,12 @@ handleSubmit = (events) =>{
 render() {
     return (
         <div>
-            <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
+            {/* <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
                 <div className="container">
                     <a className="navbar-brand" href="/">Navbar</a>
                 </div>
-            </nav>
+            </nav> */}
+            <Navbar/>
         <div className="container">
         <div className="row">
             <div className="col-md-6 mt-5 mx-auto">

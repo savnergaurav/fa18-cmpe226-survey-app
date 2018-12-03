@@ -80,7 +80,8 @@ class TextQuestion extends Component{
 
 const mapStateToProps = (state) => {
     return {
-        questions : state.question
+        questions : state.question,
+        
     }
 }
 

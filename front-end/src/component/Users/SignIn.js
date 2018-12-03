@@ -6,6 +6,8 @@ import { message } from 'antd';
 import {history} from "../../history";
 import { connect }          from 'react-redux';
 import {saveUser} from "../../store/actions";
+import {Link} from 'react-router-dom';
+import Navbar from '../Dashboard/Navbar';
 
 
 class SignIn extends Component{
@@ -52,11 +54,7 @@ class SignIn extends Component{
 
     render() {
         return <div>
-            <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
-                <div className="container">
-                    <a className="navbar-brand" href="/">Navbar</a>
-                </div>
-            </nav>
+            <Navbar/>
         <div className="container">
             <div className="row">
                 <div className="col-md-6 mt-5 mx-auto">

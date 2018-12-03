@@ -1,8 +1,6 @@
 import axios from 'axios';
-import { createBrowserHistory } from 'history';
 import {RESTService} from "../api";
-
-const history = createBrowserHistory();
+import {history} from '../history';
 
 export const ADD_QUESTION = 'ADD_QUESTION';
 export const UPDATE_QUESTION = 'UPDATE_QUESTION';
@@ -88,21 +86,24 @@ export function CreateSurvey(surveyDetails){
     var headers = new Headers();
     headers.append('Accept', 'application/json');
     return (dispatch) => {
-        const request = axios(`${api}/createSurvey`,{
-            method: 'post',
-            mode: 'no-cors',
-            redirect: 'follow',
-            withCredentials: true,
-            headers: headers,
-            data: surveyDetails
-        }).then((response)=>{
+
+        RESTService.createSurvey(surveyDetails)
+        .then((response)=>{
             if(response.status == 200){
                 dispatch(surveyCreateSuccess(response));
                 history.push('/question');
             }else{
                 dispatch(surveyCreateFailed(response))
             }
-        })
+        });
+        // const request = axios(`${api}/createSurvey`,{
+        //     method: 'post',
+        //     mode: 'no-cors',
+        //     redirect: 'follow',
+        //     withCredentials: true,
+        //     headers: headers,
+        //     data: surveyDetails
+        // })
     }    
 }
 

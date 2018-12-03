@@ -39,6 +39,7 @@ exports.createSurvey = function createSurvey(req, res) {
     let survey_url = `http://localhost:3000/response/${surveyType}/${url}`
     console.log('url');
     console.log(url);
+    console.log("Re Body : ", req.body)
     var surveyDetails = {
         "sname": req.body.surveyName,
         "sdesc": req.body.surveyDesc,
@@ -46,7 +47,7 @@ exports.createSurvey = function createSurvey(req, res) {
         "svalidity": new Date(req.body.validDate),
         "screated_date": new Date(),
         "surl": url,
-        "screated_by": "gaurav@gmail.com"
+        "screated_by": req.body.createdBy
     }
     console.log("Inside Survey Controller : ", surveyDetails);
     var insertQuery = "INSERT INTO SURVEY SET ?";
@@ -67,6 +68,7 @@ exports.createSurvey = function createSurvey(req, res) {
                         return res.status(400).send(responseJSON("SERVER_someError"));
                     }
                     else {
+                        console.log("Inside Insert Success");
                         if (req.body.surveyType == "Invite Only") {
                             emails = "";
                             var len = req.body.inviteEmails.length;
@@ -105,9 +107,15 @@ exports.createSurvey = function createSurvey(req, res) {
                                     logger.error(err);
                                     connection.release();
                                     return res.status(400).send(responseJSON("SERVER_someError"));
-                                } 
+                                }
+                                else{
+                                    console.log("SQL ERROR else");
+                                    res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
+                                    //connection.release();
+                                }
                             })
                         }
+                        console.log("NO SQL ERROR");
                         res.status(200).send({ s_id: rows.insertId, surveyName: surveyDetails.sname, message: "Survey Created Successfully" });
                         connection.release();
                     }

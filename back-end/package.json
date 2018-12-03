@@ -25,7 +25,8 @@
     "serve-favicon": "~2.5.0",
     "supertest": "^3.3.0",
     "logger": "^0.0.1",
-    "winston": "^3.1.0"
+    "winston": "^3.1.0",
+    "nodemailer": "^4.7.0"
   },
   "devDependencies": {
     "should": "^13.2.3"

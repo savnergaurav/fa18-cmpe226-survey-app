@@ -10,6 +10,7 @@ import DateQuestion from '../Questions/DateQuestion';
 
 import {QuestionAdded} from '../../store/actions';
 import {CreateQuestion} from '../../store/actions';
+import Navbar from '../Dashboard/Navbar';
 
 class QuestionPreview extends Component {
   drop = (event) => {
@@ -75,6 +76,7 @@ class QuestionPreview extends Component {
     
     return (
       <div className="App">
+        <Navbar/>
         <SideNav/>
         <div style={{marginLeft:"20%"}}>
             <div class="w3-container w3-teal">

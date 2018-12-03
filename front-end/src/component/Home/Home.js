@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import ReactDOM from 'react-dom';
+import {Link} from 'react-router-dom';
+import Navbar from '../Dashboard/Navbar';
 
 export default class Home extends Component {
     constructor(props) {
@@ -65,11 +67,18 @@ export default class Home extends Component {
     render() {
         return (
             <div>
-                <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
-                    <div className="container">
-                        <a className="navbar-brand" href="/">Navbar</a>
-                    </div>
+                {/* <nav  class="navbar navbar-default">
+                <div className="container">
+                    <Link to="/home">Navbar</Link>
+                    <Link to="/profile">Profile</Link>
+                    <Link to="/create">Create Survey</Link>
+                    <Link to="/dashboard">Dashboard</Link>
+
+                    <a to="/">Logout</a>
+                </div>
                 </nav>
+                 */}
+                <Navbar/>
                 <div className="container">
                     <div className="row">
                         <div className="col-md-3">

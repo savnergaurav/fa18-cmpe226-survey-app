@@ -9,7 +9,7 @@ import SignIn from './component/Users/SignIn';
 import Profile from './component/Users/Profile';
 import SignUp from './component/Users/SignUp';
 import {history} from "./history";
-import { connect }                  from "react-redux";
+import { connect }  from "react-redux";
 import {authenticateUser} from "./store/actions";
 
 class App extends Component {
@@ -36,9 +36,9 @@ class App extends Component {
               {isAuth ? <Route exact path='/login' component={Home} /> : <Route exact path='/login' component={SignIn} />}
               {isAuth ? <Route exact path='/register' component={Home} /> : <Route exact path='/register' component={SignUp} />}
               {isAuth ? <Route exact path='/home' component={Home} /> : <Route exact path='/home' component={SignIn} />}
-              {isAuth ? <Route exact path='/profile' component={SignIn} /> : <Route exact path='/profile' component={Profile} />}
-              {isAuth ? <Route exact path='/' component={BasicDetails} /> : <Route exact path='/' component={SignIn} />}
-              {isAuth ? <Route exact path='/question' component={QuestionPreview} /> : <Route exact path='/question' component={SignIn} />}
+              {isAuth ? <Route exact path='/profile' component={Profile} /> : <Route exact path='/profile' component={SignIn} />}
+              {isAuth ? <Route exact path='/create' component={BasicDetails} /> : <Route exact path='/create' component={SignIn} />}
+              {isAuth ? <Route exact path='/question' component={QuestionPreview} /> : <Route exact path='/question' component={QuestionPreview} />}
 
               {isAuth ? <Route exact path="/dashboard" render={() => {
                   return <Dashboard />

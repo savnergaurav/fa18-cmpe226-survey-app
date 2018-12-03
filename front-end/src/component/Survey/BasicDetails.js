@@ -6,6 +6,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import 'react-tagsinput/react-tagsinput.css';
 import {connect} from 'react-redux';
 import {CreateSurvey} from '..//../store/actions';
+import {Link} from 'react-router-dom';
+import Navbar from '../Dashboard/Navbar';
 
 class BasicDetails extends Component{
     constructor(props) {
@@ -67,7 +69,8 @@ class BasicDetails extends Component{
             surveyDesc : this.state.surveyDesc,
             surveyType : this.state.surveyType,
             validDate : this.state.validDate,
-            inviteEmails : this.state.inviteEmails
+            inviteEmails : this.state.inviteEmails,
+            createdBy : this.props.user.email
         }
         console.log("Survey Details : ", surveyDetails);
         this.props.onSubmitClicked(surveyDetails);
@@ -86,6 +89,18 @@ class BasicDetails extends Component{
             )
         }
         return(
+            <div>
+                {/* <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
+                <div className="container">
+                    <Link to="/home">Navbar</Link>
+                    <Link to="/profile">Profile</Link>
+                    <Link to="/create">Create Survey</Link>
+                    <Link to="/dashboard">Dashboard</Link>
+
+                    <a to="/">Logout</a>
+                </div>
+                </nav> */}
+                <Navbar/>
             <div  style={{marginTop : "5%", marginLeft:"30%"}}>
                 <div >
                     <div class="col col-sm-8 col-md-8 col-lg-8 col-xl-8">
@@ -130,10 +145,18 @@ class BasicDetails extends Component{
                     </div>
                 </div>
             </div>
+            </div>
         )
     }    
 }
 
+const mapStateToProps = state => {
+    const { user } = state;
+    console.log("User : ", user);
+    return {
+        user
+    };
+}
 
 const mapDispatchToProps = dispatch => {
     console.log("Inside map dipatch to props");
@@ -141,4 +164,4 @@ const mapDispatchToProps = dispatch => {
         onSubmitClicked : (details) => dispatch(CreateSurvey(details)),
     }
 }
-export default connect(null,mapDispatchToProps)(BasicDetails);
+export default connect(mapStateToProps,mapDispatchToProps)(BasicDetails);

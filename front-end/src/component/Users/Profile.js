@@ -3,7 +3,9 @@ import React, { Component } from 'react'
 import { RESTService } from "../../api";
 import {history} from "../../history";
 import { message } from 'antd';
-import { connect }          from 'react-redux';
+import { connect } from 'react-redux';
+import {Link} from 'react-router-dom';
+import Navbar from '../Dashboard/Navbar';
 
 class Profile extends Component {
     state = {
@@ -79,11 +81,17 @@ class Profile extends Component {
 
         return (
             <div>
-                <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
-                    <div className="container">
-                        <a className="navbar-brand" href="/">Navbar</a>
-                    </div>
-                </nav>
+                <Navbar/>
+                 {/* <nav className="navbar navbar-expand-sm navbar-dark bg-primary mb-3">
+                <div className="container">
+                    <Link to="/home">Navbar</Link>
+                    <Link to="/profile">Profile</Link>
+                    <Link to="/create">Create Survey</Link>
+                    <Link to="/dashboard">Dashboard</Link>
+
+                    <a to="/">Logout</a>
+                </div>
+                </nav> */}
             <div className="container">
                     <div className="col-sm-4">
                         <h1 className="text-center">PROFILE</h1>
@@ -183,11 +191,11 @@ class Profile extends Component {
 }
 
 function mapStateToProps(state) {
-
+    console.log("State in Profile : ", state.user);
     const { user } = state;
     return {
         user
     };
 }
 
-export default connect(mapStateToProps, null)(Profile);
+export default connect(mapStateToProps)(Profile);
