@@ -17,12 +17,9 @@ var profileController = require('./routes/profileController');
 var surveyController = require('./routes/surveyController');
 var questionsController = require('./routes/questionController');
 var dashboardController = require('./routes/dashboardController');
-<<<<<<< HEAD
 const log = require('./config/logger');
 
-=======
 var responseController = require('./routes/responseController');
->>>>>>> Add survey response feature
 
 // Express App
 var app = express();
